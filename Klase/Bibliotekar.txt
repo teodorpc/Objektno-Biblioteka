@@ -1,0 +1,194 @@
+interface IBibliotekar
+{
+    int ProveriJMBG(String ID);
+    int UzimanjeKnjige(String ID, String ID_Pozajmicara, String ID_knjige, DateTime Datum_izdavanja, DateTime Rok_za_vracanje);
+    int VracanjeKnjige(String ID, String ID_Pozajmicara, String ID_knjige, DateTime Datum_vracanja);
+    int DodajNoviObjekat(String ID, String Status, String Ime, String Prezime, String Ime_jednog_roditelja, String Pol, int Dan_rodenja, int Mesec_rodjenja, int Godina_rodjenja, String JMBG, String Adresa_Ulica_i_broj, String Adresa_Grad, int Adresa_Postanski_broj, String Telefon, String Email_adresa, String Stepen_strucne_spreme, String Skolsko_zvanje, String Radna_pozicija, DateTime Datum_zaposlenja, String Korisnicko_ime, String Lozinka, List<(String, DateTime)> List_svih_izdatih_knjiga, List<(String, DateTime)> Lista_svih_primljenjih_knjiga, List<(String, DateTime)> Napomena);
+    int IspraviPodatkeObjekta(String ID, String Status, String Ime, String Prezime, String Ime_jednog_roditelja, String Pol, int Dan_rodenja, int Mesec_rodjenja, int Godina_rodjenja, String JMBG, String Adresa_Ulica_i_broj, String Adresa_Grad, int Adresa_Postanski_broj, String Telefon, String Email_adresa, String Stepen_strucne_spreme, String Skolsko_zvanje, String Radna_pozicija, DateTime Datum_zaposlenja, String Korisnicko_ime, String Lozinka, List<(String, DateTime)> List_svih_izdatih_knjiga, List<(String, DateTime)> Lista_svih_primljenjih_knjiga, List<(String, DateTime)> Napomena);
+    int PromeniStatus(String ID, String Status);
+}
+
+class Bibliotekar : Osoba, IBibliotekar
+{
+    public new List<Bibliotekar> ListaAktivnih { get; protected set; }
+    public new List<Bibliotekar> ListaNeaktivnih { get; protected set; }
+
+    public String Radna_pozicija { get; protected set; }
+    public DateTime Datum_zaposlenja { get; protected set; }
+    public String Korisnicko_ime { get; protected set; }
+    public String Lozinka { get; protected set; }
+    public List<(String, DateTime)> Lista_svih_izdatih_knjiga { get; protected set; }
+    public List<(String, DateTime)> Lista_svih_primljenjih_knjiga { get; protected set; }
+
+    public Bibliotekar()
+    {
+        ListaAktivnih = new List<Bibliotekar>();
+        ListaNeaktivnih = new List<Bibliotekar>();
+    }
+
+    protected Bibliotekar(String ID, String Status, String Ime, String Prezime, String Ime_jednog_roditelja, String Pol, int Dan_rodenja, int Mesec_rodjenja, int Godina_rodjenja, String JMBG, String Adresa_Ulica_i_broj, String Adresa_Grad, int Adresa_Postanski_broj, String Telefon, String Email_adresa, String Stepen_strucne_spreme, String Skolsko_zvanje, String Radna_pozicija, DateTime Datum_zaposlenja, String Korisnicko_ime, String Lozinka, List<(String, DateTime)> Lista_svih_izdatih_knjiga, List<(String, DateTime)> Lista_svih_primljenjih_knjiga, List<(String, DateTime)> Napomena) : base(ID, Status, Ime, Prezime, Ime_jednog_roditelja, Pol, Dan_rodenja, Mesec_rodjenja, Godina_rodjenja, JMBG, Adresa_Ulica_i_broj, Adresa_Grad, Adresa_Postanski_broj, Telefon, Email_adresa, Stepen_strucne_spreme, Skolsko_zvanje, Napomena)
+    {
+        this.Radna_pozicija = Radna_pozicija;
+        this.Datum_zaposlenja = Datum_zaposlenja;
+        this.Korisnicko_ime = Korisnicko_ime;
+        this.Lozinka = Lozinka;
+        this.Lista_svih_izdatih_knjiga = new List<(String, DateTime)>();
+        foreach ((String, DateTime) t in Lista_svih_izdatih_knjiga)
+            this.Lista_svih_izdatih_knjiga.Add(t);
+        this.Lista_svih_primljenjih_knjiga = new List<(string, DateTime)>();
+        foreach ((String, DateTime) t in Lista_svih_primljenjih_knjiga)
+            this.Lista_svih_primljenjih_knjiga.Add(t);
+    }
+
+    public new int ProveriJMBG(String ID)
+    {
+        foreach (Bibliotekar o in ListaAktivnih)
+            if (o.ID == ID)
+            {
+                String Ispravan_JMBG = "";
+
+                if (Dan_rodjenja < 10)
+                    Ispravan_JMBG += "0";
+                Ispravan_JMBG += Dan_rodjenja.ToString();
+
+                if (Mesec_rodjenja < 10)
+                    Ispravan_JMBG += "0";
+                Ispravan_JMBG += Mesec_rodjenja.ToString();
+                Ispravan_JMBG += (Godina_rodjenja).ToString().Remove(0, 1);
+
+                if (o.JMBG.Substring(0, 7) == Ispravan_JMBG)
+                    return 200;
+                else
+                    return 400;
+            }
+
+        foreach (Bibliotekar o in ListaNeaktivnih)
+            if (o.ID == ID)
+                return 302;
+
+        return 404;
+    }
+
+    public new int UzimanjeKnjige(String ID, String ID_knjige, DateTime Datum_izdavanja, DateTime Rok_za_vracanje, String ID_bibliotekara)
+    {
+        throw new Exception("Ne mozes koristiti ovo!");
+    }
+
+    public new int VracanjeKnjige(String ID, String ID_knjige, DateTime Datum_vracanja, String ID_bibliotekara)
+    {
+        throw new Exception("Ne mozes koristiti ovo!");
+    }
+
+    public int UzimanjeKnjige(String ID, String ID_Pozajmicara, String ID_knjige, DateTime Datum_izdavanja, DateTime Rok_za_vracanje)
+    {
+        foreach (Bibliotekar o in ListaAktivnih)
+            if (o.ID == ID)
+            {
+                String Poruka = ID_Pozajmicara + "," + ID_knjige + "," + Datum_izdavanja.ToString() + "," + Rok_za_vracanje.ToString();
+                o.Lista_svih_izdatih_knjiga.Add((Poruka, Datum_izdavanja));
+                return 200;
+            }
+
+        foreach (Bibliotekar o in ListaNeaktivnih)
+            if (o.ID == ID)
+                return 302;
+
+        return 404;
+    }
+
+    public int VracanjeKnjige(String ID, String ID_Pozajmicara, String ID_knjige, DateTime Datum_vracanja)
+    {
+        foreach (Bibliotekar o in ListaAktivnih)
+            if (o.ID == ID)
+            {
+                o.Lista_svih_primljenjih_knjiga.Add((ID_Pozajmicara + "," + ID_knjige + "," + Datum_vracanja.ToString() + ",", Datum_vracanja));
+                return 200;
+            }
+
+        foreach (Bibliotekar o in ListaNeaktivnih)
+            if (o.ID == ID)
+                return 302;
+
+        return 404;
+    }
+
+    public new int DodajNoviObjekat(String ID, String Status, String Ime, String Prezime, String Ime_jednog_roditelja, String Pol, int Dan_rodenja, int Mesec_rodjenja, int Godina_rodjenja, String JMBG, String Adresa_Ulica_i_broj, String Adresa_Grad, int Adresa_Postanski_broj, String Telefon, String Email_adresa, String Stepen_strucne_spreme, String Skolsko_zvanje, List<(String, DateTime)> Napomena)
+    { 
+        throw new Exception("Ne mozes koristiti ovo!");
+    }
+
+    public new int IspraviPodatkeObjekta(String ID, String Status, String Ime, String Prezime, String Ime_jednog_roditelja, String Pol, int Dan_rodenja, int Mesec_rodjenja, int Godina_rodjenja, String JMBG, String Adresa_Ulica_i_broj, String Adresa_Grad, int Adresa_Postanski_broj, String Telefon, String Email_adresa, String Stepen_strucne_spreme, String Skolsko_zvanje, List<(String, DateTime)> Napomena)
+    {
+        throw new Exception("Ne mozes koristiti ovo!");
+    }
+
+    public int DodajNoviObjekat(String ID, String Status, String Ime, String Prezime, String Ime_jednog_roditelja, String Pol, int Dan_rodenja, int Mesec_rodjenja, int Godina_rodjenja, String JMBG, String Adresa_Ulica_i_broj, String Adresa_Grad, int Adresa_Postanski_broj, String Telefon, String Email_adresa, String Stepen_strucne_spreme, String Skolsko_zvanje, String Radna_pozicija, DateTime Datum_zaposlenja, String Korisnicko_ime, String Lozinka, List<(String, DateTime)> List_svih_izdatih_knjiga, List<(String, DateTime)> Lista_svih_primljenjih_knjiga, List<(String, DateTime)> Napomena)
+    {
+        foreach (Bibliotekar o in ListaAktivnih)
+            if (o.JMBG == JMBG)
+                return 1;
+            else if (o.Telefon == Telefon)
+                return 2;
+            else if (o.Email_adresa == Email_adresa)
+                return 3;
+            else if (o.Korisnicko_ime == Korisnicko_ime)
+                return 4;
+
+        if (Status == "AKTIVAN")
+            ListaAktivnih.Add(new Bibliotekar(ID, Status, Ime, Prezime, Ime_jednog_roditelja, Pol, Dan_rodenja, Mesec_rodjenja, Godina_rodjenja, JMBG, Adresa_Ulica_i_broj, Adresa_Grad, Adresa_Postanski_broj, Telefon, Email_adresa, Stepen_strucne_spreme, Skolsko_zvanje, Radna_pozicija, Datum_zaposlenja, Korisnicko_ime, Lozinka, Lista_svih_izdatih_knjiga, Lista_svih_primljenjih_knjiga, Napomena));
+        else
+            ListaNeaktivnih.Add(new Bibliotekar(ID, Status, Ime, Prezime, Ime_jednog_roditelja, Pol, Dan_rodenja, Mesec_rodjenja, Godina_rodjenja, JMBG, Adresa_Ulica_i_broj, Adresa_Grad, Adresa_Postanski_broj, Telefon, Email_adresa, Stepen_strucne_spreme, Skolsko_zvanje, Radna_pozicija, Datum_zaposlenja, Korisnicko_ime, Lozinka, Lista_svih_izdatih_knjiga, Lista_svih_primljenjih_knjiga, Napomena));
+        return 200;
+    }
+
+    public int IspraviPodatkeObjekta(String ID, String Status, String Ime, String Prezime, String Ime_jednog_roditelja, String Pol, int Dan_rodenja, int Mesec_rodjenja, int Godina_rodjenja, String JMBG, String Adresa_Ulica_i_broj, String Adresa_Grad, int Adresa_Postanski_broj, String Telefon, String Email_adresa, String Stepen_strucne_spreme, String Skolsko_zvanje, String Radna_pozicija, DateTime Datum_zaposlenja, String Korisnicko_ime, String Lozinka, List<(String, DateTime)> List_svih_izdatih_knjiga, List<(String, DateTime)> Lista_svih_primljenjih_knjiga, List<(String, DateTime)> Napomena)
+    {
+        for (int i = 0; i < ListaAktivnih.Count; i++)
+        {
+            if (ListaAktivnih[i].ID == ID)
+            {
+                foreach (Bibliotekar o in ListaAktivnih)
+                    if (o.JMBG == JMBG)
+                        return 1;
+                    else if (o.Telefon == Telefon)
+                        return 2;
+                    else if (o.Email_adresa == Email_adresa)
+                        return 3;
+                    else if (o.Korisnicko_ime == Korisnicko_ime)
+                        return 4;
+
+                ListaAktivnih.RemoveAt(i);
+
+                if (Status == "AKTIVAN")
+                    ListaAktivnih.Add(new Bibliotekar(ID, Status, Ime, Prezime, Ime_jednog_roditelja, Pol, Dan_rodenja, Mesec_rodjenja, Godina_rodjenja, JMBG, Adresa_Ulica_i_broj, Adresa_Grad, Adresa_Postanski_broj, Telefon, Email_adresa, Stepen_strucne_spreme, Skolsko_zvanje, Radna_pozicija, Datum_zaposlenja, Korisnicko_ime, Lozinka, Lista_svih_izdatih_knjiga, Lista_svih_primljenjih_knjiga, Napomena));
+                else
+                    ListaNeaktivnih.Add(new Bibliotekar(ID, Status, Ime, Prezime, Ime_jednog_roditelja, Pol, Dan_rodenja, Mesec_rodjenja, Godina_rodjenja, JMBG, Adresa_Ulica_i_broj, Adresa_Grad, Adresa_Postanski_broj, Telefon, Email_adresa, Stepen_strucne_spreme, Skolsko_zvanje, Radna_pozicija, Datum_zaposlenja, Korisnicko_ime, Lozinka, Lista_svih_izdatih_knjiga, Lista_svih_primljenjih_knjiga, Napomena));
+                return 200;
+            }
+        }
+
+        foreach (Bibliotekar o in ListaNeaktivnih)
+            if (o.ID == ID)
+                return 302;
+
+        return 404;
+    }
+
+    public new int PromeniStatus(String ID, String Status)
+    {
+        foreach (Bibliotekar o in ListaAktivnih)
+            if (o.ID == ID)
+            {
+                o.Status = Status;
+                return 200;
+            }
+        foreach (Bibliotekar o in ListaNeaktivnih)
+            if (o.ID == ID)
+            {
+                o.Status = Status;
+                return 200;
+            }
+        return 404;
+    }
+
+}
