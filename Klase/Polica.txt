@@ -1,9 +1,9 @@
 interface IPolica
 {
-    void DodajNoviObjekat(String ID, String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<(String, DateTime)> Napomena);
-    int IspraviPodatkeObjekta(String ID, String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<(String, DateTime)> Napomena);
+    void DodajNoviObjekat(String ID, String Status, String Oznaka, String Prostorija, List<(String, DateTime)> Napomena);
+    int IspraviPodatkeObjekta(String ID, String Status, String Oznaka, String Prostorija, List<(String, DateTime)> Napomena);
     int PromeniStatus(String ID, String Status);
-}
+} 
 
 class Polica:IPolica
 {
@@ -33,7 +33,7 @@ class Polica:IPolica
             this.Napomena.Add(t);
     }
 
-    public void DodajNoviObjekat(String ID, String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<(String, DateTime)> Napomena)
+    public void DodajNoviObjekat(String ID, String Status, String Oznaka, String Prostorija, List<(String, DateTime)> Napomena)
     {
         if (Status == "AKTIVAN")
             ListaAktivnih.Add(new Polica(ID, Status, Oznaka, Prostorija, Napomena));
@@ -41,7 +41,7 @@ class Polica:IPolica
             ListaNeaktivnih.Add(new Polica(ID, Status, Oznaka, Prostorija, Napomena));
     }
 
-    public int IspraviPodatkeObjekta(String ID, String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<(String, DateTime)> Napomena)
+    public int IspraviPodatkeObjekta(String ID, String Status, String Oznaka, String Prostorija, List<(String, DateTime)> Napomena)
     {
         for (int i = 0; i < ListaAktivnih.Count; i++)
             if (ListaAktivnih[i].ID == ID)
