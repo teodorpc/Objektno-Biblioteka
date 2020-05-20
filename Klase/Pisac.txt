@@ -1,0 +1,86 @@
+interface IPisac
+{
+    void DodajNoviObjekat(String ID, String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<String> Knjige, List<(String, DateTime)> Napomena);
+    int IspraviPodatkeObjekta(String ID, String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<String> Knjige, List<(String, DateTime)> Napomena);
+    int PromeniStatus(String ID, String Status);
+}  
+
+class Pisac:Covek, IPisac
+{
+    public new List<Pisac> ListaAktivnih { get; protected set; }
+    public new List<Pisac> ListaNeaktivnih { get; protected set; }
+
+    public List<String> Knjige { get; protected set; }
+
+    public Pisac()
+    {
+        ListaAktivnih = new List<Pisac>();
+        ListaNeaktivnih = new List<Pisac>();
+    }
+
+    protected Pisac(String ID, String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<String> Knjige, List<(String, DateTime)> Napomena):base(ID, Status, ime, Prezime, Pol, Godina_rodjenja, Napomena)
+    {
+        this.Knjige = new List<String>();
+        foreach (String s in Knjige)
+            this.Knjige.Add(s);
+    }
+
+    public new void DodajNoviObjekat(String ID, String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<(String, DateTime)> Napomena)
+    {
+        throw new Exception("Ne mozes koristiti ovo!");
+    }
+
+    public new int IspraviPodatkeObjekta(String ID, String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<(String, DateTime)> Napomena)
+    {
+        throw new Exception("Ne mozes koristiti ovo!");
+    }
+
+    public void DodajNoviObjekat(String ID, String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<String> Knjige, List<(String, DateTime)> Napomena)
+    {
+        if (Status == "AKTIVAN")
+            ListaAktivnih.Add(new Pisac(ID, Status, ime, Prezime, Pol, Godina_rodjenja, Knjige, Napomena));
+        else
+            ListaAktivnih.Add(new Pisac(ID, Status, ime, Prezime, Pol, Godina_rodjenja, Knjige, Napomena));
+    }
+
+    public int IspraviPodatkeObjekta(String ID, String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<String> Knjige, List<(String, DateTime)> Napomena)
+    {
+        for (int i = 0; i < ListaAktivnih.Count; i++)
+        {
+            if (ListaAktivnih[i].ID == ID)
+            {
+                ListaAktivnih.RemoveAt(i);
+
+                if (Status == "AKTIVAN")
+                    ListaAktivnih.Add(new Pisac(ID, Status, ime, Prezime, Pol, Godina_rodjenja, Knjige, Napomena));
+                else
+                    ListaAktivnih.Add(new Pisac(ID, Status, ime, Prezime, Pol, Godina_rodjenja, Knjige, Napomena));
+
+                return 200;
+            }
+        }
+
+        foreach (Pisac o in ListaNeaktivnih)
+            if (o.ID == ID)
+                return 302;
+
+        return 404;
+    }
+
+    public new int PromeniStatus(String ID, String Status)
+    {
+        foreach (Pisac covek1 in ListaAktivnih)
+            if (covek1.ID == ID)
+            {
+                covek1.Status = Status;
+                return 200;
+            }
+        foreach (Pisac covek1 in ListaNeaktivnih)
+            if (covek1.ID == ID)
+            {
+                covek1.Status = Status;
+                return 200;
+            }
+        return 404;
+    }
+}
