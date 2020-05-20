@@ -1,0 +1,96 @@
+interface ICovek
+{
+    void DodajNoviObjekat(String ID, String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<(String, DateTime)> Napomena);
+    int IspraviPodatkeObjekta(String ID, String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<(String, DateTime)> Napomena);
+    int PromeniStatus(String ID, String Status);
+}
+
+class Covek : ICovek
+{
+    public List<Covek> ListaAktivnih { get; protected set; } 
+    public List<Covek> ListaNeaktivnih { get; protected set; }
+    public string ID { get; protected set; }
+    public string Status { get; protected set; }
+    public string Ime { get; protected set; }
+    public string Prezime { get; protected set; }
+    public string Pol { get; protected set; }
+    public int Godina_rodjenja { get; protected set; }
+    public List<(String, DateTime)> Napomena { get; protected set; }
+
+    public Covek() 
+    {
+        ListaAktivnih = new List<Covek>();
+        ListaNeaktivnih = new List<Covek>();
+    }
+    protected Covek(String ID, String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<(String, DateTime)> Napomena)//konstruktor
+    {
+        this.ID = ID;
+        this.Status = Status;
+        this.Ime = ime;
+        this.Prezime = Prezime;
+        this.Pol = Pol;
+        this.Godina_rodjenja = Godina_rodjenja;
+        this.Napomena = new List<(string, DateTime)>();
+        foreach ((string, DateTime) t in Napomena)
+            this.Napomena.Add(t);
+    }
+
+    public void DodajNoviObjekat(String ID, String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<(String, DateTime)> Napomena)
+    {
+        if(Status == "AKTIVAN")
+            ListaAktivnih.Add(new Covek(ID, Status, ime, Prezime, Pol, Godina_rodjenja, Napomena));
+        else
+            ListaNeaktivnih.Add(new Covek(ID, Status, ime, Prezime, Pol, Godina_rodjenja, Napomena));
+    }
+
+    public int IspraviPodatkeObjekta(String ID, String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<(String, DateTime)> Napomena)
+    {
+        bool DaLiJeAktivan = false;
+        for (int i = 0; i < ListaAktivnih.Count; i++)
+            if(ListaAktivnih[i].ID == ID)
+            {
+                ListaAktivnih.RemoveAt(i);
+                DaLiJeAktivan = true;
+                break;
+            }
+
+        if (DaLiJeAktivan)
+        {
+            if (Status == "AKTIVAN")
+                ListaAktivnih.Add(new Covek(ID, Status, ime, Prezime, Pol, Godina_rodjenja, Napomena));
+            else
+                ListaNeaktivnih.Add(new Covek(ID, Status, ime, Prezime, Pol, Godina_rodjenja, Napomena));
+            return 200;
+        }
+
+        bool DaLiJeNeAktivan = false;
+        for (int i = 0; i < ListaNeaktivnih.Count; i++)
+            if (ListaAktivnih[i].ID == ID)
+            {
+                DaLiJeNeAktivan = true;
+                break;
+            }
+
+        if (DaLiJeNeAktivan)
+            return 302;
+
+        return 404;
+    }
+
+    public int PromeniStatus(String ID, String Status)
+    {
+        foreach (Covek covek1 in ListaAktivnih)
+            if (covek1.ID == ID)
+            {
+                covek1.Status = Status;
+                return 200;
+            }
+        foreach (Covek covek1 in ListaNeaktivnih)
+            if (covek1.ID == ID)
+            {
+                covek1.Status = Status;
+                return 200;
+            }
+        return 404;
+    }
+}

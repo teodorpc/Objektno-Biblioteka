@@ -1,0 +1,182 @@
+interface IOsoba
+{
+    int ProveriJMBG(String ID);
+    int UzimanjeKnjige(String ID, String ID_knjige, DateTime Datum_izdavanja, DateTime Rok_za_vracanje, String ID_bibliotekara);
+    int VracanjeKnjige(String ID, String ID_knjige, DateTime Datum_vracanja, String ID_bibliotekara);
+    int DodajNoviObjekat(String ID, String Status, String Ime, String Prezime, String Ime_jednog_roditelja, String Pol, int Dan_rodenja, int Mesec_rodjenja, int Godina_rodjenja, String JMBG, String Adresa_Ulica_i_broj, String Adresa_Grad, int Adresa_Postanski_broj, String Telefon, String Email_adresa, String Stepen_strucne_spreme, String Skolsko_zvanje, List<(String, DateTime)> Napomena);
+    int IspraviPodatkeObjekta(String ID, String Status, String Ime, String Prezime, String Ime_jednog_roditelja, String Pol, int Dan_rodenja, int Mesec_rodjenja, int Godina_rodjenja, String JMBG, String Adresa_Ulica_i_broj, String Adresa_Grad, int Adresa_Postanski_broj, String Telefon, String Email_adresa, String Stepen_strucne_spreme, String Skolsko_zvanje, List<(String, DateTime)> Napomena);
+    int PromeniStatus(String ID, String Status);
+}
+
+class Osoba:Covek, IOsoba
+{
+    public new List<Osoba> ListaAktivnih;
+    public new List<Osoba> ListaNeaktivnih;
+
+    public String Ime_jednog_roditelja { get; protected set; }
+    public int Dan_rodjenja { get; protected set; }
+    public int Mesec_rodjenja { get; protected set; }
+    public String JMBG { get; protected set; }
+    public String Adresa_Ulica_i_broj { get; protected set; }
+    public String Adresa_Grad { get; protected set; }
+    public int Adresa_Postanski_broj { get; protected set; }
+    public String Telefon { get; protected set; }
+    public String Email_adresa { get; protected set; }
+    public String Stepen_strucne_spreme { get; protected set; }
+    public String Skolsko_zvanje { get; protected set; }
+
+    public Osoba()
+    {
+        ListaAktivnih = new List<Osoba>();
+        ListaNeaktivnih = new List<Osoba>();
+    }
+
+    protected Osoba(String ID, String Status, String Ime, String Prezime, String Ime_jednog_roditelja, String Pol, int Dan_rodenja, int Mesec_rodjenja, int Godina_rodjenja, String JMBG, String Adresa_Ulica_i_broj, String Adresa_Grad, int Adresa_Postanski_broj, String Telefon, String Email_adresa, String Stepen_strucne_spreme, String Skolsko_zvanje, List<(String, DateTime)> Napomena):base(ID, Status, Ime, Prezime, Pol, Godina_rodjenja, Napomena)
+    {
+        this.Ime_jednog_roditelja = Ime_jednog_roditelja;
+        this.Dan_rodjenja = Dan_rodjenja;
+        this.Mesec_rodjenja = Mesec_rodjenja;
+        this.JMBG = JMBG;
+        this.Adresa_Ulica_i_broj = Adresa_Ulica_i_broj;
+        this.Adresa_Grad = Adresa_Grad;
+        this.Adresa_Postanski_broj = Adresa_Postanski_broj;
+        this.Telefon = Telefon;
+        this.Email_adresa = Email_adresa;
+        this.Stepen_strucne_spreme = Stepen_strucne_spreme;
+        this.Skolsko_zvanje = Skolsko_zvanje;
+    }
+
+    public int ProveriJMBG(String ID)
+    {
+        foreach (Osoba o in ListaAktivnih)
+            if (o.ID == ID) {
+                String Ispravan_JMBG = "";
+
+                if (Dan_rodjenja < 10)
+                    Ispravan_JMBG += "0";
+                Ispravan_JMBG += Dan_rodjenja.ToString();
+
+                if (Mesec_rodjenja < 10)
+                    Ispravan_JMBG += "0";
+                Ispravan_JMBG += Mesec_rodjenja.ToString();
+                Ispravan_JMBG += (Godina_rodjenja).ToString().Remove(0, 1);
+
+                if (o.JMBG.Substring(0, 7) == Ispravan_JMBG)
+                    return 200;
+                else
+                    return 400;
+            }
+
+        foreach (Osoba o in ListaNeaktivnih)
+            if (o.ID == ID)
+                return 302;
+
+        return 404;
+    }
+
+    public int UzimanjeKnjige(String ID, String ID_knjige, DateTime Datum_izdavanja, DateTime Rok_za_vracanje, String ID_bibliotekara)
+    {
+        foreach(Osoba o in ListaAktivnih)
+            if(o.ID == ID)
+            {
+                o.Napomena.Add(("Pozajmio:" + ID_knjige + "," + Datum_izdavanja.ToString() + "," + Rok_za_vracanje.ToString() + "," + ID_bibliotekara, Datum_izdavanja));
+                return 200;
+            }
+
+        foreach (Osoba o in ListaNeaktivnih)
+            if (o.ID == ID)
+                return 302;
+
+        return 404;
+    }
+
+    public int VracanjeKnjige(String ID, String ID_knjige, DateTime Datum_vracanja, String ID_bibliotekara)
+    {
+        foreach (Osoba o in ListaAktivnih)
+            if (o.ID == ID)
+            {
+                o.Napomena.Add(("Vratio:" + ID_knjige + "," + Datum_vracanja.ToString() + "," + ID_bibliotekara, Datum_vracanja));
+                return 200;
+            }
+
+        foreach (Osoba o in ListaNeaktivnih)
+            if (o.ID == ID)
+                return 302;
+
+        return 404;
+    }
+
+    public new void DodajNoviObjekat(String ID, String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<(String, DateTime)> Napomena) 
+    {
+        throw new Exception("Ne mozes koristiti ovo!");
+    }  
+    
+    public int DodajNoviObjekat(String ID, String Status, String Ime, String Prezime, String Ime_jednog_roditelja, String Pol, int Dan_rodenja, int Mesec_rodjenja, int Godina_rodjenja, String JMBG, String Adresa_Ulica_i_broj, String Adresa_Grad, int Adresa_Postanski_broj, String Telefon, String Email_adresa, String Stepen_strucne_spreme, String Skolsko_zvanje, List<(String, DateTime)> Napomena)
+    {
+        foreach (Osoba o in ListaAktivnih)
+            if (o.JMBG == JMBG)
+                return 1;
+            else if (o.Telefon == Telefon)
+                return 2;
+            else if (o.Email_adresa == Email_adresa)
+                return 3;
+
+        if (Status == "AKTIVAN")
+            ListaAktivnih.Add(new Osoba(ID, Status, Ime, Prezime, Ime_jednog_roditelja, Pol, Dan_rodenja, Mesec_rodjenja, Godina_rodjenja, JMBG, Adresa_Ulica_i_broj, Adresa_Grad, Adresa_Postanski_broj, Telefon, Email_adresa, Stepen_strucne_spreme, Skolsko_zvanje, Napomena));
+        else
+            ListaNeaktivnih.Add(new Osoba(ID, Status, Ime, Prezime, Ime_jednog_roditelja, Pol, Dan_rodenja, Mesec_rodjenja, Godina_rodjenja, JMBG, Adresa_Ulica_i_broj, Adresa_Grad, Adresa_Postanski_broj, Telefon, Email_adresa, Stepen_strucne_spreme, Skolsko_zvanje, Napomena));
+
+        return 200;
+    }
+
+    public int IspraviPodatkeObjekta(String ID, String Status, String Ime, String Prezime, String Ime_jednog_roditelja, String Pol, int Dan_rodenja, int Mesec_rodjenja, int Godina_rodjenja, String JMBG, String Adresa_Ulica_i_broj, String Adresa_Grad, int Adresa_Postanski_broj, String Telefon, String Email_adresa, String Stepen_strucne_spreme, String Skolsko_zvanje, List<(String, DateTime)> Napomena)
+    {
+        for (int i = 0; i < ListaAktivnih.Count; i++)
+        {
+            if (ListaAktivnih[i].ID == ID)
+            {
+                foreach (Osoba os in ListaAktivnih)
+                    if (os.JMBG == JMBG)
+                        return 1;
+                    else if (os.Telefon == Telefon)
+                        return 2;
+                    else if (os.Email_adresa == Email_adresa)
+                        return 3;
+
+                ListaAktivnih.RemoveAt(i);
+
+                if (Status == "AKTIVAN")
+                    ListaAktivnih.Add(new Osoba(ID, Status, Ime, Prezime, Ime_jednog_roditelja, Pol, Dan_rodenja, Mesec_rodjenja, Godina_rodjenja, JMBG, Adresa_Ulica_i_broj, Adresa_Grad, Adresa_Postanski_broj, Telefon, Email_adresa, Stepen_strucne_spreme, Skolsko_zvanje, Napomena));
+                else
+                    ListaNeaktivnih.Add(new Osoba(ID, Status, Ime, Prezime, Ime_jednog_roditelja, Pol, Dan_rodenja, Mesec_rodjenja, Godina_rodjenja, JMBG, Adresa_Ulica_i_broj, Adresa_Grad, Adresa_Postanski_broj, Telefon, Email_adresa, Stepen_strucne_spreme, Skolsko_zvanje, Napomena));
+
+
+                return 200;
+            }
+        }
+
+        foreach (Osoba o in ListaNeaktivnih)
+            if (o.ID == ID)
+                return 302;
+
+        return 404;
+    }
+
+
+    public new int PromeniStatus(String ID, String Status)
+    {
+        foreach (Osoba o in ListaAktivnih)
+            if (o.ID == ID)
+            {
+                o.Status = Status;
+                return 200;
+            }
+        foreach (Osoba o in ListaNeaktivnih)
+            if (o.ID == ID)
+            {
+                o.Status = Status;
+                return 200;
+            }
+        return 404;
+    }
+}

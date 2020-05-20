@@ -1,0 +1,172 @@
+interface IKnjiga
+{
+    int UzimanjeKnjige(String ID, String Stanje, String ID_citalaca, DateTime Datum_izdavanja, DateTime Rok_za_vracanje, String ID_bibliotekara);
+    int VracanjeKnjige(String ID, DateTime Datum_vracanja, String ID_Bibliotekara);
+    void DodajNoviObjekat(String ID, String Status, String Naziv_knjige, List<String> Pisac, String Zanr, int Redni_broj_izdanja, int Godina_izdavanja, String Izdavac, String ISBN_broj, String Stanje, String Prostorija, String Polica, int Ukupan_broj_primeraka, List<(String, DateTime)> Sva_izdavanja, String Citalac, DateTime Datum_izdavanja, DateTime Rok_za_vracanje, String Bibliotekar, List<(String, DateTime)> Napomena);
+    int IspraviPodatkeObjekta(String ID, String Status, String Naziv_knjige, List<String> Pisac, String Zanr, int Redni_broj_izdanja, int Godina_izdavanja, String Izdavac, String ISBN_broj, String Stanje, String Prostorija, String Polica, int Ukupan_broj_primeraka, List<(String, DateTime)> Sva_izdavanja, String Citalac, DateTime Datum_izdavanja, DateTime Rok_za_vracanje, String Bibliotekar, List<(String, DateTime)> Napomene);
+    int PromeniStatus(String ID, String Status);
+    int AzuriranjePisca(String ID, List<String> Pisac);
+}
+
+class Knjiga: IKnjiga
+{
+    public List<Knjiga> ListaAktivnih { get; private set; }
+    public List<Knjiga> ListaNeaktivnih { get; private set; }
+
+    public String ID { get; private set; }
+    public String Status { get; private set; }
+    public String Naziv_knjige { get; private set; }
+    public List<String> Pisac { get; private set; }
+    public String Zanr { get; private set; }
+    public int Redni_broj_izdanja { get; private set; }
+    public int Godina_izdavanja { get; private set; }
+    public String Izdavac { get; private set; }
+    public String ISBN_broj { get; private set; }
+    public String Stanje { get; private set; }
+    public String Prostorija { get; private set; }
+    public String Polica { get; private set; }
+    public int Ukupan_broj_primeraka { get; private set; }
+    public List<(String, DateTime)> Sva_izdanja { get; private set; }
+    public String Citalac { get; private set; }
+    public DateTime Datum_izdavanja { get; private set; }
+    public DateTime Rok_za_vracanje { get; private set; }
+    public String Bibliotekar { get; private set; }
+    public List<(String, DateTime)> Napomena { get; private set; }
+
+    public Knjiga()
+    {
+        ListaAktivnih = new List<Knjiga>();
+        ListaNeaktivnih = new List<Knjiga>();
+    }
+
+    protected Knjiga(String ID, String Status, String Naziv_knjige, List<String> Pisac, String Zanr, int Redni_broj_izdanja, int Godina_izdavanja, String Izdavac, String ISBN_broj, String Stanje, String Prostorija, String Polica, int Ukupan_broj_primeraka, List<(String, DateTime)> Sva_izdanja, String Citalac, DateTime Datum_izdavanja, DateTime Rok_za_vracanje, String Bibliotekar, List<(String, DateTime)> Napomena)
+    {
+        this.ID = ID;
+        this.Status = Status;
+        this.Naziv_knjige = Naziv_knjige;
+        this.Pisac = new List<string>();
+        foreach (String s in Pisac)
+            this.Pisac.Add(s);
+        this.Zanr = Zanr;
+        this.Redni_broj_izdanja = Redni_broj_izdanja;
+        this.Godina_izdavanja = Godina_izdavanja;
+        this.Izdavac = Izdavac;
+        this.ISBN_broj = ISBN_broj;
+        this.Stanje = Stanje;
+        this.Prostorija = Prostorija;
+        this.Polica = Polica;
+        this.Ukupan_broj_primeraka = Ukupan_broj_primeraka;
+        this.Sva_izdanja = new List<(String, DateTime)>();
+        foreach ((String, DateTime) s in Sva_izdanja)
+            this.Sva_izdanja.Add(s);
+        this.Citalac = Citalac;
+        this.Datum_izdavanja = Datum_izdavanja;
+        this.Rok_za_vracanje = Rok_za_vracanje;
+        this.Bibliotekar = Bibliotekar;
+        this.Napomena = new List<(string, DateTime)>();
+        foreach ((String, DateTime) s in Napomena)
+            this.Napomena.Add(s);
+    }
+
+    public int UzimanjeKnjige(String ID, String Stanje, String ID_citalaca, DateTime Datum_izdavanja, DateTime Rok_za_vracanje, String ID_bibliotekara)
+    {
+        Knjiga k;
+
+        for (int i = 0; i < ListaAktivnih.Count; i++)
+            if(ListaAktivnih[i].ID == ID)
+            {
+                k = ListaAktivnih[i];
+                ListaAktivnih.RemoveAt(i);
+                k.Stanje = Stanje;
+                k.Citalac = ID_citalaca;
+                k.Bibliotekar = ID_bibliotekara;
+                k.Datum_izdavanja = Datum_izdavanja;
+                k.Rok_za_vracanje = Rok_za_vracanje;
+                k.Sva_izdanja.Add(("Izdata:" + ID_citalaca + "," + Datum_izdavanja.ToString() + "," + Rok_za_vracanje.ToString() + "," + ID_bibliotekara, Datum_izdavanja));
+                ListaAktivnih.Add(k);
+                return 200;
+            }
+
+        for (int i = 0; i < ListaNeaktivnih.Count; i++)
+            if (ListaNeaktivnih[i].ID == ID)
+                return 302;
+
+        return 404;
+    }
+
+    public int VracanjeKnjige(String ID, DateTime Datum_vracanja, String ID_Bibliotekara)
+    {
+        Knjiga k;
+        for (int i = 0; i < ListaAktivnih.Count; i++)
+            if (ListaAktivnih[i].ID == ID)
+            {
+                k = ListaAktivnih[i];
+                ListaAktivnih.RemoveAt(i);
+                k.Stanje = "U BIBLIOTECI";
+                k.Sva_izdanja.Add(("Vracena:" + Datum_vracanja.ToString() + "," + ID_Bibliotekara, Datum_vracanja));
+                ListaAktivnih.Add(k);
+                return 200;
+            }
+        return 404;
+    }
+
+    public void DodajNoviObjekat(String ID, String Status, String Naziv_knjige, List<String> Pisac, String Zanr, int Redni_broj_izdanja, int Godina_izdavanja, String Izdavac, String ISBN_broj, String Stanje, String Prostorija, String Polica, int Ukupan_broj_primeraka, List<(String, DateTime)> Sva_izdavanja, String Citalac, DateTime Datum_izdavanja, DateTime Rok_za_vracanje, String Bibliotekar, List<(String, DateTime)> Napomena)
+    {
+        if (Status == "AKTIVNA")
+            ListaAktivnih.Add(new Knjiga(ID, Status, Naziv_knjige, Pisac, Zanr, Redni_broj_izdanja, Godina_izdavanja, Izdavac, ISBN_broj, Stanje, Prostorija, Polica, Ukupan_broj_primeraka, Sva_izdanja, Citalac, Datum_izdavanja, Rok_za_vracanje, Bibliotekar, Napomena));
+        else
+            ListaNeaktivnih.Add(new Knjiga(ID, Status, Naziv_knjige, Pisac, Zanr, Redni_broj_izdanja, Godina_izdavanja, Izdavac, ISBN_broj, Stanje, Prostorija, Polica, Ukupan_broj_primeraka, Sva_izdanja, Citalac, Datum_izdavanja, Rok_za_vracanje, Bibliotekar, Napomena));
+    }
+
+    public int IspraviPodatkeObjekta(String ID, String Status, String Naziv_knjige, List<String> Pisac, String Zanr, int Redni_broj_izdanja, int Godina_izdavanja, String Izdavac, String ISBN_broj, String Stanje, String Prostorija, String Polica, int Ukupan_broj_primeraka, List<(String, DateTime)> Sva_izdavanja, String Citalac, DateTime Datum_izdavanja, DateTime Rok_za_vracanje, String Bibliotekar, List<(String, DateTime)> Napomene)
+    {
+        for (int i = 0; i < ListaAktivnih.Count; i++)
+            if(ListaAktivnih[i].ID == ID)
+            {
+                if (Status == "AKTIVNA")
+                    ListaAktivnih.Add(new Knjiga(ID, Status, Naziv_knjige, Pisac, Zanr, Redni_broj_izdanja, Godina_izdavanja, Izdavac, ISBN_broj, Stanje, Prostorija, Polica, Ukupan_broj_primeraka, Sva_izdanja, Citalac, Datum_izdavanja, Rok_za_vracanje, Bibliotekar, Napomena));
+                else
+                    ListaNeaktivnih.Add(new Knjiga(ID, Status, Naziv_knjige, Pisac, Zanr, Redni_broj_izdanja, Godina_izdavanja, Izdavac, ISBN_broj, Stanje, Prostorija, Polica, Ukupan_broj_primeraka, Sva_izdanja, Citalac, Datum_izdavanja, Rok_za_vracanje, Bibliotekar, Napomena));
+                return 200;
+            }
+
+        for (int i = 0; i < ListaNeaktivnih.Count; i++)
+            if (ListaAktivnih[i].ID == ID)
+                return 302;
+
+        return 404;
+    }
+
+    public int PromeniStatus(String ID, String Status)
+    {
+        foreach (Knjiga k in ListaAktivnih)
+            if (ID == k.ID)
+            {
+                k.Status = Status;
+                return 200;
+            }
+
+        foreach (Knjiga k in ListaNeaktivnih)
+            if (ID == k.ID)
+            {
+                k.Status = Status;
+                return 200;
+            }
+
+        return 404;
+    }
+
+    public int AzuriranjePisca(String ID, List<String> Pisac)
+    {
+        foreach (Knjiga k in ListaAktivnih)
+            if (ID == k.ID)
+            {
+                k.Pisac = Pisac;
+                return 200;
+            }
+        foreach (Knjiga k in ListaNeaktivnih)
+            if (ID == k.ID)
+                return 302;
+        return 404;
+    }
+}
