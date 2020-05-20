@@ -1,0 +1,83 @@
+interface IProstorija
+{
+    void DodajNoviObjekat(String ID, String Status, String Oznaka, String Police, List<(String, DateTime)> Napomena);
+    int IspraviPodatkeObjekta(String ID, String Status, String Oznaka, String Police, List<(String, DateTime)> Napomena);
+    int PromeniStatus(String ID, String Status);
+} 
+
+class Prostorija : IProstorija
+{
+    public List<Prostorija> ListaAktivnih { get; protected set; }
+    public List<Prostorija> ListaNeaktivnih { get; protected set; }
+
+    public String ID { get; protected set; }
+    public String Status { get; protected set; }
+    public String Oznaka { get; protected set; }
+    public String Police { get; protected set; }
+    public List<(String, DateTime)> Napomena { get; protected set; }
+
+    public Prostorija()
+    {
+        ListaAktivnih = new List<Prostorija>();
+        ListaNeaktivnih = new List<Prostorija>();
+    }
+
+    protected Prostorija(String ID, String Status, String Oznaka, String Police, List<(String, DateTime)> Napomena)
+    {
+        this.ID = ID;
+        this.Status = Status;
+        this.Oznaka = Oznaka;
+        this.Police = Police;
+        this.Napomena = new List<(string, DateTime)>();
+        foreach ((String, DateTime) t in Napomena)
+            this.Napomena.Add(t);
+    }
+
+    public void DodajNoviObjekat(String ID, String Status, String Oznaka, String Police, List<(String, DateTime)> Napomena)
+    {
+        if (Status == "AKTIVAN")
+            ListaAktivnih.Add(new Prostorija(ID, Status, Oznaka, Police, Napomena));
+        else
+            ListaNeaktivnih.Add(new Prostorija(ID, Status, Oznaka, Police, Napomena));
+    }
+
+    public int IspraviPodatkeObjekta(String ID, String Status, String Oznaka, String Police, List<(String, DateTime)> Napomena)
+    {
+        for (int i = 0; i < ListaAktivnih.Count; i++)
+            if (ListaAktivnih[i].ID == ID)
+            {
+                ListaAktivnih.RemoveAt(i);
+
+                if (Status == "AKTIVAN")
+                    ListaAktivnih.Add(new Prostorija(ID, Status, Oznaka, Police, Napomena));
+                else
+                    ListaNeaktivnih.Add(new Prostorija(ID, Status, Oznaka, Police, Napomena));
+                return 200;
+            }
+
+        for (int i = 0; i < ListaNeaktivnih.Count; i++)
+            if (ListaAktivnih[i].ID == ID)
+                return 302;
+
+        return 404;
+    }
+
+    public int PromeniStatus(String ID, String Status)
+    {
+        foreach (Prostorija covek1 in ListaAktivnih)
+            if (covek1.ID == ID)
+            {
+                covek1.Status = Status;
+                return 200;
+            }
+        foreach (Prostorija covek1 in ListaNeaktivnih)
+            if (covek1.ID == ID)
+            {
+                covek1.Status = Status;
+                return 200;
+            }
+        return 404;
+    }
+
+
+}
