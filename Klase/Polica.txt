@@ -1,0 +1,82 @@
+interface IPolica
+{
+    void DodajNoviObjekat(String ID, String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<(String, DateTime)> Napomena);
+    int IspraviPodatkeObjekta(String ID, String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<(String, DateTime)> Napomena);
+    int PromeniStatus(String ID, String Status);
+}
+
+class Polica:IPolica
+{
+    public List<Polica> ListaAktivnih { get; protected set; }
+    public List<Polica> ListaNeaktivnih { get; protected set; }
+
+    public String ID { get; protected set; }
+    public String Status { get; protected set; }
+    public String Oznaka { get; protected set; }
+    public String Prostorija { get; protected set; }
+    public List<(String, DateTime)> Napomena { get; protected set; }
+
+    public Polica()
+    {
+        ListaAktivnih = new List<Polica>();
+        ListaNeaktivnih = new List<Polica>();
+    }
+
+    protected Polica(String ID, String Status, String Oznaka, String Prostorija, List<(String, DateTime)> Napomena)
+    {
+        this.ID = ID;
+        this.Status = Status;
+        this.Oznaka = Oznaka;
+        this.Prostorija = Prostorija;
+        this.Napomena = new List<(string, DateTime)>();
+        foreach ((String, DateTime) t in Napomena)
+            this.Napomena.Add(t);
+    }
+
+    public void DodajNoviObjekat(String ID, String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<(String, DateTime)> Napomena)
+    {
+        if (Status == "AKTIVAN")
+            ListaAktivnih.Add(new Polica(ID, Status, Oznaka, Prostorija, Napomena));
+        else
+            ListaNeaktivnih.Add(new Polica(ID, Status, Oznaka, Prostorija, Napomena));
+    }
+
+    public int IspraviPodatkeObjekta(String ID, String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<(String, DateTime)> Napomena)
+    {
+        for (int i = 0; i < ListaAktivnih.Count; i++)
+            if (ListaAktivnih[i].ID == ID)
+            {
+                ListaAktivnih.RemoveAt(i);
+
+                if (Status == "AKTIVAN")
+                    ListaAktivnih.Add(new Polica(ID, Status, Oznaka, Prostorija, Napomena));
+                else
+                    ListaNeaktivnih.Add(new Polica(ID, Status, Oznaka, Prostorija, Napomena));
+                return 200;
+            }
+
+        for (int i = 0; i < ListaNeaktivnih.Count; i++)
+            if (ListaAktivnih[i].ID == ID)
+                return 302;
+
+        return 404;
+    }
+
+    public int PromeniStatus(String ID, String Status)
+    {
+        foreach (Polica covek1 in ListaAktivnih)
+            if (covek1.ID == ID)
+            {
+                covek1.Status = Status;
+                return 200;
+            }
+        foreach (Polica covek1 in ListaNeaktivnih)
+            if (covek1.ID == ID)
+            {
+                covek1.Status = Status;
+                return 200;
+            }
+        return 404;
+    }
+
+}
