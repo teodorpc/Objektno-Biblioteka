@@ -1,0 +1,200 @@
+interface ICitalac
+{
+    int ProveriJMBG(String ID);
+    int UzimanjeKnjige(String ID, String ID_knjige, DateTime Datum_izdavanja, DateTime Rok_za_vracanje, String ID_bibliotekara);
+    int VracanjeKnjige(String ID, String ID_knjige, DateTime Datum_vracanja, String ID_bibliotekara);
+    int DodajNoviObjekat(String ID, String Status, String Ime, String Prezime, String Ime_jednog_roditelja, String Pol, int Dan_rodenja, int Mesec_rodjenja, int Godina_rodjenja, String JMBG, String Adresa_Ulica_i_broj, String Adresa_Grad, int Adresa_Postanski_broj, String Telefon, String Email_adresa, String Stepen_strucne_spreme, String Skolsko_zvanje, String Trenutni_radni_status, String Broj_ID_dokumenta, String Broj_clanske_karte, DateTime Prvi_upis, DateTime Produzenje_clanstva, float Iznos_clanarine, DateTime Trajanje_clanstva, List<(String, DateTime)> Lista_svih_knjiga, List<(String, DateTime)> Lista_trenutno_uzetih_knjiga, List<(String, DateTime)> Napomena);
+    int IspraviPodatkeObjketa(String ID, String Status, String Ime, String Prezime, String Ime_jednog_roditelja, String Pol, int Dan_rodenja, int Mesec_rodjenja, int Godina_rodjenja, String JMBG, String Adresa_Ulica_i_broj, String Adresa_Grad, int Adresa_Postanski_broj, String Telefon, String Email_adresa, String Stepen_strucne_spreme, String Skolsko_zvanje, String Trenutni_radni_status, String Broj_ID_dokumenta, String Broj_clanske_karte, DateTime Prvi_upis, DateTime Produzenje_clanstva, float Iznos_clanarine, DateTime Trajanje_clanstva, List<(String, DateTime)> Lista_svih_knjiga, List<(String, DateTime)> Lista_trenutno_uzetih_knjiga, List<(String, DateTime)> Napomena);
+    int PromeniStatus(String ID, String Status);
+}
+
+class Citalac:Osoba, ICitalac
+{
+    public new List<Citalac> ListaAktivnih { get; protected set; }
+    public new List<Citalac> ListaNeaktivnih { get; protected set; }
+
+    public String Trenutni_radni_status { get; protected set; }
+    public String Broj_ID_dokumenta { get; protected set; }
+    public String Broj_clanske_karte { get; protected set; }
+    public DateTime Prvi_upis { get; protected set; }
+    public DateTime Produzenje_clanstva { get; protected set; }
+    public float Iznos_clanarine { get; protected set; }
+    public DateTime Trajanje_clanstva { get; protected set; }
+    public List<(String, DateTime)> Lista_svih_knjiga { get; protected set; }
+    public List<(String, DateTime)> Lista_trenutno_uzetih_knjiga { get; protected set; }
+
+    public Citalac()
+    {
+        ListaAktivnih = new List<Citalac>();
+        ListaNeaktivnih = new List<Citalac>();
+    }
+
+    protected Citalac(String ID, String Status, String Ime, String Prezime, String Ime_jednog_roditelja, String Pol, int Dan_rodenja, int Mesec_rodjenja, int Godina_rodjenja, String JMBG, String Adresa_Ulica_i_broj, String Adresa_Grad, int Adresa_Postanski_broj, String Telefon, String Email_adresa, String Stepen_strucne_spreme, String Skolsko_zvanje, String Trenutni_radni_status, String Broj_ID_dokumenta, String Broj_clanske_karte, DateTime Prvi_upis, DateTime Produzenje_clanstva, float Iznos_clanarine, DateTime Trajanje_clanstva, List<(String, DateTime)> Lista_svih_knjiga, List<(String, DateTime)> Lista_trenutno_uzetih_knjiga, List<(String, DateTime)> Napomena) : base(ID, Status, Ime, Prezime, Ime_jednog_roditelja, Pol, Dan_rodenja, Mesec_rodjenja, Godina_rodjenja, JMBG, Adresa_Ulica_i_broj, Adresa_Grad, Adresa_Postanski_broj, Telefon, Email_adresa, Stepen_strucne_spreme, Skolsko_zvanje, Napomena)
+    {
+        this.Trenutni_radni_status = Trenutni_radni_status;
+        this.Broj_ID_dokumenta = Broj_ID_dokumenta;
+        this.Broj_clanske_karte = Broj_clanske_karte;
+        this.Prvi_upis = Prvi_upis;
+        this.Produzenje_clanstva = Produzenje_clanstva;
+        this.Iznos_clanarine = Iznos_clanarine;
+        this.Trajanje_clanstva = Trajanje_clanstva;
+        this.Lista_svih_knjiga = new List<(String, DateTime)>();
+        foreach ((String, DateTime) s in Lista_svih_knjiga)
+            this.Lista_svih_knjiga.Add(s);
+        this.Lista_trenutno_uzetih_knjiga = new List<(string, DateTime)>();
+        foreach ((String, DateTime) s in Lista_trenutno_uzetih_knjiga)
+            this.Lista_trenutno_uzetih_knjiga.Add(s);
+    }
+
+    public new int ProveriJMBG(String ID)
+    {
+        foreach (Citalac o in ListaAktivnih)
+            if (o.ID == ID)
+            {
+                String Ispravan_JMBG = "";
+
+                if (Dan_rodjenja < 10)
+                    Ispravan_JMBG += "0";
+                Ispravan_JMBG += Dan_rodjenja.ToString();
+
+                if (Mesec_rodjenja < 10)
+                    Ispravan_JMBG += "0";
+                Ispravan_JMBG += Mesec_rodjenja.ToString();
+                Ispravan_JMBG += (Godina_rodjenja).ToString().Remove(0, 1);
+
+                if (o.JMBG.Substring(0, 7) == Ispravan_JMBG)
+                    return 200;
+                else
+                    return 400;
+            }
+
+        foreach (Citalac o in ListaNeaktivnih)
+            if (o.ID == ID)
+                return 302;
+
+        return 404;
+    }
+
+    public new int UzimanjeKnjige(String ID, String ID_knjige, DateTime Datum_izdavanja, DateTime Rok_za_vracanje, String ID_bibliotekara)
+    {
+        foreach (Citalac o in ListaAktivnih)
+            if (o.ID == ID)
+            {
+                String Poruka = ID_knjige + "," + Datum_izdavanja.ToString() + "," + Rok_za_vracanje.ToString() + "," + ID_bibliotekara;
+                o.Lista_svih_knjiga.Add((Poruka, Datum_izdavanja));
+                o.Lista_trenutno_uzetih_knjiga.Add((Poruka, Datum_izdavanja));
+                return 200;
+            }
+
+        foreach (Citalac o in ListaNeaktivnih)
+            if (o.ID == ID)
+                return 302;
+
+        return 404;
+    }
+
+    public new int VracanjeKnjige(String ID, String ID_knjige, DateTime Datum_vracanja, String ID_bibliotekara)
+    {
+        foreach (Citalac o in ListaAktivnih)
+            if (o.ID == ID)
+            {
+                o.Napomena.Add(("Vratio:" + ID_knjige + "," + Datum_vracanja.ToString() + "," + ID_bibliotekara, Datum_vracanja));
+                for (int i = 0; i < o.Lista_trenutno_uzetih_knjiga.Count; i++) {
+                    String Poruka = o.Lista_trenutno_uzetih_knjiga[i].Item1;
+                    if (Poruka.Substring(0, Poruka.IndexOf(',')) == ID_knjige)
+                        o.Lista_trenutno_uzetih_knjiga.RemoveAt(i);
+                }
+                return 200;
+            }
+
+        foreach (Citalac o in ListaNeaktivnih)
+            if (o.ID == ID)
+                return 302;
+
+        return 404;
+    }
+
+    public new int DodajNoviObjekat(String ID, String Status, String Ime, String Prezime, String Ime_jednog_roditelja, String Pol, int Dan_rodenja, int Mesec_rodjenja, int Godina_rodjenja, String JMBG, String Adresa_Ulica_i_broj, String Adresa_Grad, int Adresa_Postanski_broj, String Telefon, String Email_adresa, String Stepen_strucne_spreme, String Skolsko_zvanje, List<(String, DateTime)> Napomena)
+    {
+        throw new Exception("Ne mozes koristiti ovo!");
+    }
+
+    public new int IspraviPodatkeObjekta(String ID, String Status, String Ime, String Prezime, String Ime_jednog_roditelja, String Pol, int Dan_rodenja, int Mesec_rodjenja, int Godina_rodjenja, String JMBG, String Adresa_Ulica_i_broj, String Adresa_Grad, int Adresa_Postanski_broj, String Telefon, String Email_adresa, String Stepen_strucne_spreme, String Skolsko_zvanje, List<(String, DateTime)> Napomena)
+    {
+        throw new Exception("Ne mozes koristiti ovo!");
+    }
+
+    public int DodajNoviObjekat(String ID, String Status, String Ime, String Prezime, String Ime_jednog_roditelja, String Pol, int Dan_rodenja, int Mesec_rodjenja, int Godina_rodjenja, String JMBG, String Adresa_Ulica_i_broj, String Adresa_Grad, int Adresa_Postanski_broj, String Telefon, String Email_adresa, String Stepen_strucne_spreme, String Skolsko_zvanje, String Trenutni_radni_status, String Broj_ID_dokumenta, String Broj_clanske_karte, DateTime Prvi_upis, DateTime Produzenje_clanstva, float Iznos_clanarine, DateTime Trajanje_clanstva, List<(String, DateTime)> Lista_svih_knjiga, List<(String, DateTime)> Lista_trenutno_uzetih_knjiga, List<(String, DateTime)> Napomena)
+    {
+        foreach (Citalac o in ListaAktivnih)
+            if (o.JMBG == JMBG)
+                return 1;
+            else if (o.Telefon == Telefon)
+                return 2;
+            else if (o.Email_adresa == Email_adresa)
+                return 3;
+            else if (o.Broj_ID_dokumenta == Broj_ID_dokumenta)
+                return 4;
+            else if (o.Broj_clanske_karte == Broj_clanske_karte)
+                return 5;
+
+        if (Status == "AKTIVAN")
+            ListaAktivnih.Add(new Citalac(ID, Status, Ime, Prezime, Ime_jednog_roditelja, Pol, Dan_rodenja, Mesec_rodjenja, Godina_rodjenja, JMBG, Adresa_Ulica_i_broj, Adresa_Grad, Adresa_Postanski_broj, Telefon, Email_adresa, Stepen_strucne_spreme, Skolsko_zvanje, Trenutni_radni_status, Broj_ID_dokumenta, Broj_clanske_karte, Prvi_upis, Produzenje_clanstva, Iznos_clanarine, Trajanje_clanstva, Lista_svih_knjiga, Lista_trenutno_uzetih_knjiga, Napomena));
+        else
+            ListaNeaktivnih.Add(new Citalac(ID, Status, Ime, Prezime, Ime_jednog_roditelja, Pol, Dan_rodenja, Mesec_rodjenja, Godina_rodjenja, JMBG, Adresa_Ulica_i_broj, Adresa_Grad, Adresa_Postanski_broj, Telefon, Email_adresa, Stepen_strucne_spreme, Skolsko_zvanje, Trenutni_radni_status, Broj_ID_dokumenta, Broj_clanske_karte, Prvi_upis, Produzenje_clanstva, Iznos_clanarine, Trajanje_clanstva, Lista_svih_knjiga, Lista_trenutno_uzetih_knjiga, Napomena));
+        return 200;
+    }
+
+    public int IspraviPodatkeObjketa(String ID, String Status, String Ime, String Prezime, String Ime_jednog_roditelja, String Pol, int Dan_rodenja, int Mesec_rodjenja, int Godina_rodjenja, String JMBG, String Adresa_Ulica_i_broj, String Adresa_Grad, int Adresa_Postanski_broj, String Telefon, String Email_adresa, String Stepen_strucne_spreme, String Skolsko_zvanje, String Trenutni_radni_status, String Broj_ID_dokumenta, String Broj_clanske_karte, DateTime Prvi_upis, DateTime Produzenje_clanstva, float Iznos_clanarine, DateTime Trajanje_clanstva, List<(String, DateTime)> Lista_svih_knjiga, List<(String, DateTime)> Lista_trenutno_uzetih_knjiga, List<(String, DateTime)> Napomena)
+    {
+        for (int i = 0; i < ListaAktivnih.Count; i++)
+        {
+            if (ListaAktivnih[i].ID == ID)
+            {
+                foreach (Citalac o in ListaAktivnih)
+                    if (o.JMBG == JMBG)
+                        return 1;
+                    else if (o.Telefon == Telefon)
+                        return 2;
+                    else if (o.Email_adresa == Email_adresa)
+                        return 3;
+                    else if (o.Broj_ID_dokumenta == Broj_ID_dokumenta)
+                        return 4;
+                    else if (o.Broj_clanske_karte == Broj_clanske_karte)
+                        return 5;
+
+                ListaAktivnih.RemoveAt(i);
+
+                if (Status == "AKTIVAN")
+                    ListaAktivnih.Add(new Citalac(ID, Status, Ime, Prezime, Ime_jednog_roditelja, Pol, Dan_rodenja, Mesec_rodjenja, Godina_rodjenja, JMBG, Adresa_Ulica_i_broj, Adresa_Grad, Adresa_Postanski_broj, Telefon, Email_adresa, Stepen_strucne_spreme, Skolsko_zvanje, Trenutni_radni_status, Broj_ID_dokumenta, Broj_clanske_karte, Prvi_upis, Produzenje_clanstva, Iznos_clanarine, Trajanje_clanstva, Lista_svih_knjiga, Lista_trenutno_uzetih_knjiga, Napomena));
+                else
+                    ListaNeaktivnih.Add(new Citalac(ID, Status, Ime, Prezime, Ime_jednog_roditelja, Pol, Dan_rodenja, Mesec_rodjenja, Godina_rodjenja, JMBG, Adresa_Ulica_i_broj, Adresa_Grad, Adresa_Postanski_broj, Telefon, Email_adresa, Stepen_strucne_spreme, Skolsko_zvanje, Trenutni_radni_status, Broj_ID_dokumenta, Broj_clanske_karte, Prvi_upis, Produzenje_clanstva, Iznos_clanarine, Trajanje_clanstva, Lista_svih_knjiga, Lista_trenutno_uzetih_knjiga, Napomena));
+                return 200;
+            }
+        }
+
+        foreach (Citalac o in ListaNeaktivnih)
+            if (o.ID == ID)
+                return 302;
+
+        return 404;
+    }
+
+    public new int PromeniStatus(String ID, String Status)
+    {
+        foreach (Citalac o in ListaAktivnih)
+            if (o.ID == ID)
+            {
+                o.Status = Status;
+                return 200;
+            }
+        foreach (Citalac o in ListaNeaktivnih)
+            if (o.ID == ID)
+            {
+                o.Status = Status;
+                return 200;
+            }
+        return 404;
+    }
+
+}
