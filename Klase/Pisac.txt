@@ -5,7 +5,7 @@ interface IPisac
     int PromeniStatus(String ID, String Status);
 }  
 
-class Pisac:Covek, IPisac
+public class Pisac : Covek, IPisac
 {
     public new List<Pisac> ListaAktivnih { get; protected set; }
     public new List<Pisac> ListaNeaktivnih { get; protected set; }
@@ -18,11 +18,29 @@ class Pisac:Covek, IPisac
         ListaNeaktivnih = new List<Pisac>();
     }
 
-    protected Pisac(String ID, String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<String> Knjige, List<(String, DateTime)> Napomena):base(ID, Status, ime, Prezime, Pol, Godina_rodjenja, Napomena)
+    protected Pisac(String ID, String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<String> Knjige, List<(String, DateTime)> Napomena) : base(ID, Status, ime, Prezime, Pol, Godina_rodjenja, Napomena)
     {
         this.Knjige = new List<String>();
         foreach (String s in Knjige)
             this.Knjige.Add(s);
+    }
+
+    public new Pisac PronadjiUAktivnim(String ID)
+    {
+        foreach (Pisac c in ListaAktivnih)
+            if (c.ID == ID)
+                return c;
+
+        return null;
+    }
+
+    public new Pisac PronadjiUNeaktivnim(String ID)
+    {
+        foreach (Pisac c in ListaNeaktivnih)
+            if (c.ID == ID)
+                return c;
+
+        return null;
     }
 
     public new void DodajNoviObjekat(String ID, String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<(String, DateTime)> Napomena)

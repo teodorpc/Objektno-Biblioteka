@@ -8,7 +8,7 @@ interface ICitalac
     int PromeniStatus(String ID, String Status);
 }
 
-class Citalac:Osoba, ICitalac
+public class Citalac : Osoba, ICitalac
 {
     public new List<Citalac> ListaAktivnih { get; protected set; }
     public new List<Citalac> ListaNeaktivnih { get; protected set; }
@@ -44,6 +44,24 @@ class Citalac:Osoba, ICitalac
         this.Lista_trenutno_uzetih_knjiga = new List<(string, DateTime)>();
         foreach ((String, DateTime) s in Lista_trenutno_uzetih_knjiga)
             this.Lista_trenutno_uzetih_knjiga.Add(s);
+    }
+
+    public new Citalac PronadjiUAktivnim(String ID)
+    {
+        foreach (Citalac c in ListaAktivnih)
+            if (c.ID == ID)
+                return c;
+
+        return null;
+    }
+
+    public new Citalac PronadjiUNeaktivnim(String ID)
+    {
+        foreach (Citalac c in ListaNeaktivnih)
+            if (c.ID == ID)
+                return c;
+
+        return null;
     }
 
     public new int ProveriJMBG(String ID)
@@ -99,7 +117,8 @@ class Citalac:Osoba, ICitalac
             if (o.ID == ID)
             {
                 o.Napomena.Add(("Vratio:" + ID_knjige + "," + Datum_vracanja.ToString() + "," + ID_bibliotekara, Datum_vracanja));
-                for (int i = 0; i < o.Lista_trenutno_uzetih_knjiga.Count; i++) {
+                for (int i = 0; i < o.Lista_trenutno_uzetih_knjiga.Count; i++)
+                {
                     String Poruka = o.Lista_trenutno_uzetih_knjiga[i].Item1;
                     if (Poruka.Substring(0, Poruka.IndexOf(',')) == ID_knjige)
                         o.Lista_trenutno_uzetih_knjiga.RemoveAt(i);
@@ -138,6 +157,18 @@ class Citalac:Osoba, ICitalac
             else if (o.Broj_clanske_karte == Broj_clanske_karte)
                 return 5;
 
+        foreach (Citalac o in ListaNeaktivnih)
+            if (o.JMBG == JMBG)
+                return 21;
+            else if (o.Telefon == Telefon)
+                return 22;
+            else if (o.Email_adresa == Email_adresa)
+                return 23;
+            else if (o.Broj_ID_dokumenta == Broj_ID_dokumenta)
+                return 24;
+            else if (o.Broj_clanske_karte == Broj_clanske_karte)
+                return 25;
+
         if (Status == "AKTIVAN")
             ListaAktivnih.Add(new Citalac(ID, Status, Ime, Prezime, Ime_jednog_roditelja, Pol, Dan_rodenja, Mesec_rodjenja, Godina_rodjenja, JMBG, Adresa_Ulica_i_broj, Adresa_Grad, Adresa_Postanski_broj, Telefon, Email_adresa, Stepen_strucne_spreme, Skolsko_zvanje, Trenutni_radni_status, Broj_ID_dokumenta, Broj_clanske_karte, Prvi_upis, Produzenje_clanstva, Iznos_clanarine, Trajanje_clanstva, Lista_svih_knjiga, Lista_trenutno_uzetih_knjiga, Napomena));
         else
@@ -162,6 +193,18 @@ class Citalac:Osoba, ICitalac
                         return 4;
                     else if (o.Broj_clanske_karte == Broj_clanske_karte)
                         return 5;
+
+                foreach (Citalac o in ListaNeaktivnih)
+                    if (o.JMBG == JMBG)
+                        return 21;
+                    else if (o.Telefon == Telefon)
+                        return 22;
+                    else if (o.Email_adresa == Email_adresa)
+                        return 23;
+                    else if (o.Broj_ID_dokumenta == Broj_ID_dokumenta)
+                        return 24;
+                    else if (o.Broj_clanske_karte == Broj_clanske_karte)
+                        return 25;
 
                 ListaAktivnih.RemoveAt(i);
 

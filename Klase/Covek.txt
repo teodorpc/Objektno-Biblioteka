@@ -5,9 +5,14 @@ interface ICovek
     int PromeniStatus(String ID, String Status);
 }
 
-class Covek : ICovek
+public class Covek : ICovek
 {
-    public List<Covek> ListaAktivnih { get; protected set; } 
+    /* KOMENTAR
+     * U main-u se prvo mora napraviti jedan covek(npr. covek1), koriscenjem konstruktora,
+     * zatim se dodaju kao covek1.DodajNoviObjekat();
+     */
+
+    public List<Covek> ListaAktivnih { get; protected set; }
     public List<Covek> ListaNeaktivnih { get; protected set; }
     public string ID { get; protected set; }
     public string Status { get; protected set; }
@@ -17,11 +22,12 @@ class Covek : ICovek
     public int Godina_rodjenja { get; protected set; }
     public List<(String, DateTime)> Napomena { get; protected set; }
 
-    public Covek() 
+    public Covek()
     {
         ListaAktivnih = new List<Covek>();
         ListaNeaktivnih = new List<Covek>();
     }
+
     protected Covek(String ID, String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<(String, DateTime)> Napomena)//konstruktor
     {
         this.ID = ID;
@@ -35,9 +41,27 @@ class Covek : ICovek
             this.Napomena.Add(t);
     }
 
+    public Covek PronadjiUAktivnim(String ID)
+    {
+        foreach (Covek c in ListaAktivnih)
+            if (c.ID == ID)
+                return c;
+
+        return null;
+    }
+
+    public Covek PronadjiUNeaktivnim(String ID)
+    {
+        foreach (Covek c in ListaNeaktivnih)
+            if (c.ID == ID)
+                return c;
+
+        return null;
+    }
+
     public void DodajNoviObjekat(String ID, String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<(String, DateTime)> Napomena)
     {
-        if(Status == "AKTIVAN")
+        if (Status == "AKTIVAN")
             ListaAktivnih.Add(new Covek(ID, Status, ime, Prezime, Pol, Godina_rodjenja, Napomena));
         else
             ListaNeaktivnih.Add(new Covek(ID, Status, ime, Prezime, Pol, Godina_rodjenja, Napomena));
@@ -47,7 +71,7 @@ class Covek : ICovek
     {
         bool DaLiJeAktivan = false;
         for (int i = 0; i < ListaAktivnih.Count; i++)
-            if(ListaAktivnih[i].ID == ID)
+            if (ListaAktivnih[i].ID == ID)
             {
                 ListaAktivnih.RemoveAt(i);
                 DaLiJeAktivan = true;

@@ -8,7 +8,7 @@ interface IKnjiga
     int AzuriranjePisca(String ID, List<String> Pisac);
 }
 
-class Knjiga: IKnjiga
+public class Knjiga : IKnjiga
 {
     public List<Knjiga> ListaAktivnih { get; private set; }
     public List<Knjiga> ListaNeaktivnih { get; private set; }
@@ -68,12 +68,30 @@ class Knjiga: IKnjiga
             this.Napomena.Add(s);
     }
 
+    public Knjiga PronadjiUAktivnim(String ID)
+    {
+        foreach (Knjiga c in ListaAktivnih)
+            if (c.ID == ID)
+                return c;
+
+        return null;
+    }
+
+    public Knjiga PronadjiUNeaktivnim(String ID)
+    {
+        foreach (Knjiga c in ListaNeaktivnih)
+            if (c.ID == ID)
+                return c;
+
+        return null;
+    }
+
     public int UzimanjeKnjige(String ID, String Stanje, String ID_citalaca, DateTime Datum_izdavanja, DateTime Rok_za_vracanje, String ID_bibliotekara)
     {
         Knjiga k;
 
         for (int i = 0; i < ListaAktivnih.Count; i++)
-            if(ListaAktivnih[i].ID == ID)
+            if (ListaAktivnih[i].ID == ID)
             {
                 k = ListaAktivnih[i];
                 ListaAktivnih.RemoveAt(i);
@@ -121,7 +139,7 @@ class Knjiga: IKnjiga
     public int IspraviPodatkeObjekta(String ID, String Status, String Naziv_knjige, List<String> Pisac, String Zanr, int Redni_broj_izdanja, int Godina_izdavanja, String Izdavac, String ISBN_broj, String Stanje, String Prostorija, String Polica, int Ukupan_broj_primeraka, List<(String, DateTime)> Sva_izdavanja, String Citalac, DateTime Datum_izdavanja, DateTime Rok_za_vracanje, String Bibliotekar, List<(String, DateTime)> Napomene)
     {
         for (int i = 0; i < ListaAktivnih.Count; i++)
-            if(ListaAktivnih[i].ID == ID)
+            if (ListaAktivnih[i].ID == ID)
             {
                 if (Status == "AKTIVNA")
                     ListaAktivnih.Add(new Knjiga(ID, Status, Naziv_knjige, Pisac, Zanr, Redni_broj_izdanja, Godina_izdavanja, Izdavac, ISBN_broj, Stanje, Prostorija, Polica, Ukupan_broj_primeraka, Sva_izdanja, Citalac, Datum_izdavanja, Rok_za_vracanje, Bibliotekar, Napomena));

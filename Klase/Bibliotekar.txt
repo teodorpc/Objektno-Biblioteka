@@ -8,7 +8,7 @@ interface IBibliotekar
     int PromeniStatus(String ID, String Status);
 }
 
-class Bibliotekar : Osoba, IBibliotekar
+public class Bibliotekar : Osoba, IBibliotekar
 {
     public new List<Bibliotekar> ListaAktivnih { get; protected set; }
     public new List<Bibliotekar> ListaNeaktivnih { get; protected set; }
@@ -38,6 +38,24 @@ class Bibliotekar : Osoba, IBibliotekar
         this.Lista_svih_primljenjih_knjiga = new List<(string, DateTime)>();
         foreach ((String, DateTime) t in Lista_svih_primljenjih_knjiga)
             this.Lista_svih_primljenjih_knjiga.Add(t);
+    }
+
+    public new Bibliotekar PronadjiUAktivnim(String ID)
+    {
+        foreach (Bibliotekar c in ListaAktivnih)
+            if (c.ID == ID)
+                return c;
+
+        return null;
+    }
+
+    public new Bibliotekar PronadjiUNeaktivnim(String ID)
+    {
+        foreach (Bibliotekar c in ListaNeaktivnih)
+            if (c.ID == ID)
+                return c;
+
+        return null;
     }
 
     public new int ProveriJMBG(String ID)
@@ -113,7 +131,7 @@ class Bibliotekar : Osoba, IBibliotekar
     }
 
     public new int DodajNoviObjekat(String ID, String Status, String Ime, String Prezime, String Ime_jednog_roditelja, String Pol, int Dan_rodenja, int Mesec_rodjenja, int Godina_rodjenja, String JMBG, String Adresa_Ulica_i_broj, String Adresa_Grad, int Adresa_Postanski_broj, String Telefon, String Email_adresa, String Stepen_strucne_spreme, String Skolsko_zvanje, List<(String, DateTime)> Napomena)
-    { 
+    {
         throw new Exception("Ne mozes koristiti ovo!");
     }
 
@@ -133,6 +151,16 @@ class Bibliotekar : Osoba, IBibliotekar
                 return 3;
             else if (o.Korisnicko_ime == Korisnicko_ime)
                 return 4;
+
+        foreach (Bibliotekar o in ListaNeaktivnih)
+            if (o.JMBG == JMBG)
+                return 21;
+            else if (o.Telefon == Telefon)
+                return 22;
+            else if (o.Email_adresa == Email_adresa)
+                return 23;
+            else if (o.Korisnicko_ime == Korisnicko_ime)
+                return 24;
 
         if (Status == "AKTIVAN")
             ListaAktivnih.Add(new Bibliotekar(ID, Status, Ime, Prezime, Ime_jednog_roditelja, Pol, Dan_rodenja, Mesec_rodjenja, Godina_rodjenja, JMBG, Adresa_Ulica_i_broj, Adresa_Grad, Adresa_Postanski_broj, Telefon, Email_adresa, Stepen_strucne_spreme, Skolsko_zvanje, Radna_pozicija, Datum_zaposlenja, Korisnicko_ime, Lozinka, Lista_svih_izdatih_knjiga, Lista_svih_primljenjih_knjiga, Napomena));
@@ -156,6 +184,16 @@ class Bibliotekar : Osoba, IBibliotekar
                         return 3;
                     else if (o.Korisnicko_ime == Korisnicko_ime)
                         return 4;
+
+                foreach (Bibliotekar o in ListaNeaktivnih)
+                    if (o.JMBG == JMBG)
+                        return 21;
+                    else if (o.Telefon == Telefon)
+                        return 22;
+                    else if (o.Email_adresa == Email_adresa)
+                        return 23;
+                    else if (o.Korisnicko_ime == Korisnicko_ime)
+                        return 24;
 
                 ListaAktivnih.RemoveAt(i);
 

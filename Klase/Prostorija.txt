@@ -5,7 +5,7 @@ interface IProstorija
     int PromeniStatus(String ID, String Status);
 } 
 
-class Prostorija : IProstorija
+public class Prostorija : IProstorija
 {
     public List<Prostorija> ListaAktivnih { get; protected set; }
     public List<Prostorija> ListaNeaktivnih { get; protected set; }
@@ -33,6 +33,23 @@ class Prostorija : IProstorija
             this.Napomena.Add(t);
     }
 
+    public Prostorija PronadjiUAktivnim(String ID)
+    {
+        foreach (Prostorija c in ListaAktivnih)
+            if (c.ID == ID)
+                return c;
+
+        return null;
+    }
+
+    public Prostorija PronadjiUNeaktivnim(String ID)
+    {
+        foreach (Prostorija c in ListaNeaktivnih)
+            if (c.ID == ID)
+                return c;
+
+        return null;
+    }
     public void DodajNoviObjekat(String ID, String Status, String Oznaka, String Police, List<(String, DateTime)> Napomena)
     {
         if (Status == "AKTIVAN")

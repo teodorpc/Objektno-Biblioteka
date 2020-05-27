@@ -5,7 +5,7 @@ interface IPolica
     int PromeniStatus(String ID, String Status);
 } 
 
-class Polica:IPolica
+public class Polica : IPolica
 {
     public List<Polica> ListaAktivnih { get; protected set; }
     public List<Polica> ListaNeaktivnih { get; protected set; }
@@ -31,6 +31,24 @@ class Polica:IPolica
         this.Napomena = new List<(string, DateTime)>();
         foreach ((String, DateTime) t in Napomena)
             this.Napomena.Add(t);
+    }
+
+    public Polica PronadjiUAktivnim(String ID)
+    {
+        foreach (Polica c in ListaAktivnih)
+            if (c.ID == ID)
+                return c;
+
+        return null;
+    }
+
+    public Polica PronadjiUNeaktivnim(String ID)
+    {
+        foreach (Polica c in ListaNeaktivnih)
+            if (c.ID == ID)
+                return c;
+
+        return null;
     }
 
     public void DodajNoviObjekat(String ID, String Status, String Oznaka, String Prostorija, List<(String, DateTime)> Napomena)
