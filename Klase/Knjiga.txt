@@ -2,7 +2,7 @@ interface IKnjiga
 {
     int UzimanjeKnjige(String ID, String Stanje, String ID_citalaca, DateTime Datum_izdavanja, DateTime Rok_za_vracanje, String ID_bibliotekara);
     int VracanjeKnjige(String ID, DateTime Datum_vracanja, String ID_Bibliotekara);
-    void DodajNoviObjekat(String ID, String Status, String Naziv_knjige, List<String> Pisac, String Zanr, int Redni_broj_izdanja, int Godina_izdavanja, String Izdavac, String ISBN_broj, String Stanje, String Prostorija, String Polica, int Ukupan_broj_primeraka, List<(String, DateTime)> Sva_izdavanja, String Citalac, DateTime Datum_izdavanja, DateTime Rok_za_vracanje, String Bibliotekar, List<(String, DateTime)> Napomena);
+    void DodajNoviObjekat(String Status, String Naziv_knjige, List<String> Pisac, String Zanr, int Redni_broj_izdanja, int Godina_izdavanja, String Izdavac, String ISBN_broj, String Stanje, String Prostorija, String Polica, int Ukupan_broj_primeraka, List<(String, DateTime)> Sva_izdavanja, String Citalac, DateTime Datum_izdavanja, DateTime Rok_za_vracanje, String Bibliotekar, List<(String, DateTime)> Napomena);
     int IspraviPodatkeObjekta(String ID, String Status, String Naziv_knjige, List<String> Pisac, String Zanr, int Redni_broj_izdanja, int Godina_izdavanja, String Izdavac, String ISBN_broj, String Stanje, String Prostorija, String Polica, int Ukupan_broj_primeraka, List<(String, DateTime)> Sva_izdavanja, String Citalac, DateTime Datum_izdavanja, DateTime Rok_za_vracanje, String Bibliotekar, List<(String, DateTime)> Napomene);
     int PromeniStatus(String ID, String Status);
     int AzuriranjePisca(String ID, List<String> Pisac);
@@ -12,6 +12,8 @@ public class Knjiga : IKnjiga
 {
     public List<Knjiga> ListaAktivnih { get; private set; }
     public List<Knjiga> ListaNeaktivnih { get; private set; }
+
+    private static Int64 SledeciID = 0;
 
     public String ID { get; private set; }
     public String Status { get; private set; }
@@ -128,8 +130,11 @@ public class Knjiga : IKnjiga
         return 404;
     }
 
-    public void DodajNoviObjekat(String ID, String Status, String Naziv_knjige, List<String> Pisac, String Zanr, int Redni_broj_izdanja, int Godina_izdavanja, String Izdavac, String ISBN_broj, String Stanje, String Prostorija, String Polica, int Ukupan_broj_primeraka, List<(String, DateTime)> Sva_izdavanja, String Citalac, DateTime Datum_izdavanja, DateTime Rok_za_vracanje, String Bibliotekar, List<(String, DateTime)> Napomena)
+    public void DodajNoviObjekat(String Status, String Naziv_knjige, List<String> Pisac, String Zanr, int Redni_broj_izdanja, int Godina_izdavanja, String Izdavac, String ISBN_broj, String Stanje, String Prostorija, String Polica, int Ukupan_broj_primeraka, List<(String, DateTime)> Sva_izdavanja, String Citalac, DateTime Datum_izdavanja, DateTime Rok_za_vracanje, String Bibliotekar, List<(String, DateTime)> Napomena)
     {
+        String ID = SledeciID.ToString();
+        SledeciID++;
+
         if (Status == "AKTIVNA")
             ListaAktivnih.Add(new Knjiga(ID, Status, Naziv_knjige, Pisac, Zanr, Redni_broj_izdanja, Godina_izdavanja, Izdavac, ISBN_broj, Stanje, Prostorija, Polica, Ukupan_broj_primeraka, Sva_izdanja, Citalac, Datum_izdavanja, Rok_za_vracanje, Bibliotekar, Napomena));
         else
@@ -157,19 +162,35 @@ public class Knjiga : IKnjiga
 
     public int PromeniStatus(String ID, String Status)
     {
-        foreach (Knjiga k in ListaAktivnih)
-            if (ID == k.ID)
+        for (int i = 0; i < ListaAktivnih.Count; i++)
+        {
+            Knjiga covek1 = ListaAktivnih[i];
+            if (covek1.ID == ID)
             {
-                k.Status = Status;
+                covek1.Status = Status;
+                if (Status != "AKTIVAN")
+                {
+                    ListaAktivnih.RemoveAt(i);
+                    ListaNeaktivnih.Add(covek1);
+                }
                 return 200;
             }
+        }
 
-        foreach (Knjiga k in ListaNeaktivnih)
-            if (ID == k.ID)
+        for (int i = 0; i < ListaAktivnih.Count; i++)
+        {
+            Knjiga covek1 = ListaAktivnih[i];
+            if (covek1.ID == ID)
             {
-                k.Status = Status;
+                covek1.Status = Status;
+                if (Status == "AKTIVAN")
+                {
+                    ListaNeaktivnih.RemoveAt(i);
+                    ListaAktivnih.Add(covek1);
+                }
                 return 200;
             }
+        }
 
         return 404;
     }

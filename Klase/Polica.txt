@@ -1,6 +1,6 @@
 interface IPolica
 {
-    void DodajNoviObjekat(String ID, String Status, String Oznaka, String Prostorija, List<(String, DateTime)> Napomena);
+    void DodajNoviObjekat(String Status, String Oznaka, String Prostorija, List<(String, DateTime)> Napomena);
     int IspraviPodatkeObjekta(String ID, String Status, String Oznaka, String Prostorija, List<(String, DateTime)> Napomena);
     int PromeniStatus(String ID, String Status);
 } 
@@ -9,6 +9,8 @@ public class Polica : IPolica
 {
     public List<Polica> ListaAktivnih { get; protected set; }
     public List<Polica> ListaNeaktivnih { get; protected set; }
+
+    private static Int64 SledeciID = 0;
 
     public String ID { get; protected set; }
     public String Status { get; protected set; }
@@ -33,26 +35,11 @@ public class Polica : IPolica
             this.Napomena.Add(t);
     }
 
-    public Polica PronadjiUAktivnim(String ID)
+    public void DodajNoviObjekat(String Status, String Oznaka, String Prostorija, List<(String, DateTime)> Napomena)
     {
-        foreach (Polica c in ListaAktivnih)
-            if (c.ID == ID)
-                return c;
+        String ID = SledeciID.ToString();
+        SledeciID++;
 
-        return null;
-    }
-
-    public Polica PronadjiUNeaktivnim(String ID)
-    {
-        foreach (Polica c in ListaNeaktivnih)
-            if (c.ID == ID)
-                return c;
-
-        return null;
-    }
-
-    public void DodajNoviObjekat(String ID, String Status, String Oznaka, String Prostorija, List<(String, DateTime)> Napomena)
-    {
         if (Status == "AKTIVAN")
             ListaAktivnih.Add(new Polica(ID, Status, Oznaka, Prostorija, Napomena));
         else
@@ -82,18 +69,36 @@ public class Polica : IPolica
 
     public int PromeniStatus(String ID, String Status)
     {
-        foreach (Polica covek1 in ListaAktivnih)
+        for (int i = 0; i < ListaAktivnih.Count; i++)
+        {
+            Polica covek1 = ListaAktivnih[i];
             if (covek1.ID == ID)
             {
                 covek1.Status = Status;
+                if (Status != "AKTIVAN")
+                {
+                    ListaAktivnih.RemoveAt(i);
+                    ListaNeaktivnih.Add(covek1);
+                }
                 return 200;
             }
-        foreach (Polica covek1 in ListaNeaktivnih)
+        }
+
+        for (int i = 0; i < ListaAktivnih.Count; i++)
+        {
+            Polica covek1 = ListaAktivnih[i];
             if (covek1.ID == ID)
             {
                 covek1.Status = Status;
+                if (Status == "AKTIVAN")
+                {
+                    ListaNeaktivnih.RemoveAt(i);
+                    ListaAktivnih.Add(covek1);
+                }
                 return 200;
             }
+        }
+
         return 404;
     }
 

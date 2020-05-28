@@ -1,14 +1,16 @@
 interface IPisac
 {
-    void DodajNoviObjekat(String ID, String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<String> Knjige, List<(String, DateTime)> Napomena);
+    void DodajNoviObjekat(String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<String> Knjige, List<(String, DateTime)> Napomena);
     int IspraviPodatkeObjekta(String ID, String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<String> Knjige, List<(String, DateTime)> Napomena);
     int PromeniStatus(String ID, String Status);
-}  
+}
 
 public class Pisac : Covek, IPisac
 {
     public new List<Pisac> ListaAktivnih { get; protected set; }
     public new List<Pisac> ListaNeaktivnih { get; protected set; }
+
+    private static Int64 SledeciID = 0;
 
     public List<String> Knjige { get; protected set; }
 
@@ -25,24 +27,6 @@ public class Pisac : Covek, IPisac
             this.Knjige.Add(s);
     }
 
-    public new Pisac PronadjiUAktivnim(String ID)
-    {
-        foreach (Pisac c in ListaAktivnih)
-            if (c.ID == ID)
-                return c;
-
-        return null;
-    }
-
-    public new Pisac PronadjiUNeaktivnim(String ID)
-    {
-        foreach (Pisac c in ListaNeaktivnih)
-            if (c.ID == ID)
-                return c;
-
-        return null;
-    }
-
     public new void DodajNoviObjekat(String ID, String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<(String, DateTime)> Napomena)
     {
         throw new Exception("Ne mozes koristiti ovo!");
@@ -53,8 +37,11 @@ public class Pisac : Covek, IPisac
         throw new Exception("Ne mozes koristiti ovo!");
     }
 
-    public void DodajNoviObjekat(String ID, String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<String> Knjige, List<(String, DateTime)> Napomena)
+    public void DodajNoviObjekat(String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<String> Knjige, List<(String, DateTime)> Napomena)
     {
+        String ID = SledeciID.ToString();
+        SledeciID++;
+
         if (Status == "AKTIVAN")
             ListaAktivnih.Add(new Pisac(ID, Status, ime, Prezime, Pol, Godina_rodjenja, Knjige, Napomena));
         else
@@ -87,18 +74,36 @@ public class Pisac : Covek, IPisac
 
     public new int PromeniStatus(String ID, String Status)
     {
-        foreach (Pisac covek1 in ListaAktivnih)
+        for (int i = 0; i < ListaAktivnih.Count; i++)
+        {
+            Pisac covek1 = ListaAktivnih[i];
             if (covek1.ID == ID)
             {
                 covek1.Status = Status;
+                if (Status != "AKTIVAN")
+                {
+                    ListaAktivnih.RemoveAt(i);
+                    ListaNeaktivnih.Add(covek1);
+                }
                 return 200;
             }
-        foreach (Pisac covek1 in ListaNeaktivnih)
+        }
+
+        for (int i = 0; i < ListaAktivnih.Count; i++)
+        {
+            Pisac covek1 = ListaAktivnih[i];
             if (covek1.ID == ID)
             {
                 covek1.Status = Status;
+                if (Status == "AKTIVAN")
+                {
+                    ListaNeaktivnih.RemoveAt(i);
+                    ListaAktivnih.Add(covek1);
+                }
                 return 200;
             }
+        }
+
         return 404;
     }
 }

@@ -1,19 +1,17 @@
 interface ICovek
 {
-    void DodajNoviObjekat(String ID, String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<(String, DateTime)> Napomena);
+    void DodajNoviObjekat(String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<(String, DateTime)> Napomena);
     int IspraviPodatkeObjekta(String ID, String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<(String, DateTime)> Napomena);
     int PromeniStatus(String ID, String Status);
-}
+} 
 
 public class Covek : ICovek
 {
-    /* KOMENTAR
-     * U main-u se prvo mora napraviti jedan covek(npr. covek1), koriscenjem konstruktora,
-     * zatim se dodaju kao covek1.DodajNoviObjekat();
-     */
-
     public List<Covek> ListaAktivnih { get; protected set; }
     public List<Covek> ListaNeaktivnih { get; protected set; }
+
+    private static Int64 SledeciID = 0;
+
     public string ID { get; protected set; }
     public string Status { get; protected set; }
     public string Ime { get; protected set; }
@@ -41,26 +39,11 @@ public class Covek : ICovek
             this.Napomena.Add(t);
     }
 
-    public Covek PronadjiUAktivnim(String ID)
+    public void DodajNoviObjekat(String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<(String, DateTime)> Napomena)
     {
-        foreach (Covek c in ListaAktivnih)
-            if (c.ID == ID)
-                return c;
+        String ID = SledeciID.ToString();
+        SledeciID++;
 
-        return null;
-    }
-
-    public Covek PronadjiUNeaktivnim(String ID)
-    {
-        foreach (Covek c in ListaNeaktivnih)
-            if (c.ID == ID)
-                return c;
-
-        return null;
-    }
-
-    public void DodajNoviObjekat(String ID, String Status, String ime, String Prezime, String Pol, int Godina_rodjenja, List<(String, DateTime)> Napomena)
-    {
         if (Status == "AKTIVAN")
             ListaAktivnih.Add(new Covek(ID, Status, ime, Prezime, Pol, Godina_rodjenja, Napomena));
         else
@@ -103,18 +86,36 @@ public class Covek : ICovek
 
     public int PromeniStatus(String ID, String Status)
     {
-        foreach (Covek covek1 in ListaAktivnih)
+        for (int i = 0; i < ListaAktivnih.Count; i++)
+        {
+            Covek covek1 = ListaAktivnih[i];
             if (covek1.ID == ID)
             {
                 covek1.Status = Status;
+                if (Status != "AKTIVAN")
+                {
+                    ListaAktivnih.RemoveAt(i);
+                    ListaNeaktivnih.Add(covek1);
+                }
                 return 200;
             }
-        foreach (Covek covek1 in ListaNeaktivnih)
+        }
+
+        for (int i = 0; i < ListaAktivnih.Count; i++)
+        {
+            Covek covek1 = ListaAktivnih[i];
             if (covek1.ID == ID)
             {
                 covek1.Status = Status;
+                if (Status == "AKTIVAN")
+                {
+                    ListaNeaktivnih.RemoveAt(i);
+                    ListaAktivnih.Add(covek1);
+                }
                 return 200;
             }
+        }
+
         return 404;
     }
 }

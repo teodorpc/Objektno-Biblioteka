@@ -3,7 +3,7 @@ interface IOsoba
     int ProveriJMBG(String ID);
     int UzimanjeKnjige(String ID, String ID_knjige, DateTime Datum_izdavanja, DateTime Rok_za_vracanje, String ID_bibliotekara);
     int VracanjeKnjige(String ID, String ID_knjige, DateTime Datum_vracanja, String ID_bibliotekara);
-    int DodajNoviObjekat(String ID, String Status, String Ime, String Prezime, String Ime_jednog_roditelja, String Pol, int Dan_rodenja, int Mesec_rodjenja, int Godina_rodjenja, String JMBG, String Adresa_Ulica_i_broj, String Adresa_Grad, int Adresa_Postanski_broj, String Telefon, String Email_adresa, String Stepen_strucne_spreme, String Skolsko_zvanje, List<(String, DateTime)> Napomena);
+    int DodajNoviObjekat(String Status, String Ime, String Prezime, String Ime_jednog_roditelja, String Pol, int Dan_rodenja, int Mesec_rodjenja, int Godina_rodjenja, String JMBG, String Adresa_Ulica_i_broj, String Adresa_Grad, int Adresa_Postanski_broj, String Telefon, String Email_adresa, String Stepen_strucne_spreme, String Skolsko_zvanje, List<(String, DateTime)> Napomena);
     int IspraviPodatkeObjekta(String ID, String Status, String Ime, String Prezime, String Ime_jednog_roditelja, String Pol, int Dan_rodenja, int Mesec_rodjenja, int Godina_rodjenja, String JMBG, String Adresa_Ulica_i_broj, String Adresa_Grad, int Adresa_Postanski_broj, String Telefon, String Email_adresa, String Stepen_strucne_spreme, String Skolsko_zvanje, List<(String, DateTime)> Napomena);
     int PromeniStatus(String ID, String Status);
 }
@@ -12,6 +12,8 @@ public class Osoba : Covek, IOsoba
 {
     public new List<Osoba> ListaAktivnih { get; protected set; }
     public new List<Osoba> ListaNeaktivnih { get; protected set; }
+
+    private static Int64 SledeciID = 0;
 
     public String Ime_jednog_roditelja { get; protected set; }
     public int Dan_rodjenja { get; protected set; }
@@ -44,24 +46,6 @@ public class Osoba : Covek, IOsoba
         this.Email_adresa = Email_adresa;
         this.Stepen_strucne_spreme = Stepen_strucne_spreme;
         this.Skolsko_zvanje = Skolsko_zvanje;
-    }
-
-    public new Osoba PronadjiUAktivnim(String ID)
-    {
-        foreach (Osoba c in ListaAktivnih)
-            if (c.ID == ID)
-                return c;
-
-        return null;
-    }
-
-    public new Osoba PronadjiUNeaktivnim(String ID)
-    {
-        foreach (Osoba c in ListaNeaktivnih)
-            if (c.ID == ID)
-                return c;
-
-        return null;
     }
 
     public int ProveriJMBG(String ID)
@@ -135,7 +119,7 @@ public class Osoba : Covek, IOsoba
         throw new Exception("Ne mozes koristiti ovo!");
     }
 
-    public int DodajNoviObjekat(String ID, String Status, String Ime, String Prezime, String Ime_jednog_roditelja, String Pol, int Dan_rodenja, int Mesec_rodjenja, int Godina_rodjenja, String JMBG, String Adresa_Ulica_i_broj, String Adresa_Grad, int Adresa_Postanski_broj, String Telefon, String Email_adresa, String Stepen_strucne_spreme, String Skolsko_zvanje, List<(String, DateTime)> Napomena)
+    public int DodajNoviObjekat(String Status, String Ime, String Prezime, String Ime_jednog_roditelja, String Pol, int Dan_rodenja, int Mesec_rodjenja, int Godina_rodjenja, String JMBG, String Adresa_Ulica_i_broj, String Adresa_Grad, int Adresa_Postanski_broj, String Telefon, String Email_adresa, String Stepen_strucne_spreme, String Skolsko_zvanje, List<(String, DateTime)> Napomena)
     {
         foreach (Osoba o in ListaAktivnih)
             if (o.JMBG == JMBG)
@@ -152,6 +136,9 @@ public class Osoba : Covek, IOsoba
                 return 22;
             else if (o.Email_adresa == Email_adresa)
                 return 23;
+
+        String ID = SledeciID.ToString();
+        SledeciID++;
 
         if (Status == "AKTIVAN")
             ListaAktivnih.Add(new Osoba(ID, Status, Ime, Prezime, Ime_jednog_roditelja, Pol, Dan_rodenja, Mesec_rodjenja, Godina_rodjenja, JMBG, Adresa_Ulica_i_broj, Adresa_Grad, Adresa_Postanski_broj, Telefon, Email_adresa, Stepen_strucne_spreme, Skolsko_zvanje, Napomena));
@@ -204,18 +191,36 @@ public class Osoba : Covek, IOsoba
 
     public new int PromeniStatus(String ID, String Status)
     {
-        foreach (Osoba o in ListaAktivnih)
-            if (o.ID == ID)
+        for (int i = 0; i < ListaAktivnih.Count; i++)
+        {
+            Osoba covek1 = ListaAktivnih[i];
+            if (covek1.ID == ID)
             {
-                o.Status = Status;
+                covek1.Status = Status;
+                if (Status != "AKTIVAN")
+                {
+                    ListaAktivnih.RemoveAt(i);
+                    ListaNeaktivnih.Add(covek1);
+                }
                 return 200;
             }
-        foreach (Osoba o in ListaNeaktivnih)
-            if (o.ID == ID)
+        }
+
+        for (int i = 0; i < ListaAktivnih.Count; i++)
+        {
+            Osoba covek1 = ListaAktivnih[i];
+            if (covek1.ID == ID)
             {
-                o.Status = Status;
+                covek1.Status = Status;
+                if (Status == "AKTIVAN")
+                {
+                    ListaNeaktivnih.RemoveAt(i);
+                    ListaAktivnih.Add(covek1);
+                }
                 return 200;
             }
+        }
+
         return 404;
     }
 }
