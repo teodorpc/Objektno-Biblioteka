@@ -1,7 +1,7 @@
 interface IProstorija
 {
-    void DodajNoviObjekat(String Status, String Oznaka, List<String> Police, List<(String, DateTime)> Napomena);
-    int IspraviPodatkeObjekta(String ID, String Status, String Oznaka, List<String> Police, List<(String, DateTime)> Napomena);
+    void DodajNoviObjekat(String Status, String Oznaka, List<(String, DateTime)> Napomena);
+    int IspraviPodatkeObjekta(String ID, String Status, String Oznaka, List<(String, DateTime)> Napomena);
     int PromeniStatus(String ID, String Status);
 }
 
@@ -15,7 +15,6 @@ public class Prostorija : IProstorija
     public String ID { get; protected set; }
     public String Status { get; protected set; }
     public String Oznaka { get; protected set; }
-    public List<String> Police { get; protected set; }
     public List<(String, DateTime)> Napomena { get; protected set; }
 
     public Prostorija()
@@ -24,31 +23,29 @@ public class Prostorija : IProstorija
         ListaNeaktivnih = new List<Prostorija>();
     }
 
-    protected Prostorija(String ID, String Status, String Oznaka, List<String> Police, List<(String, DateTime)> Napomena)
+    protected Prostorija(String ID, String Status, String Oznaka, List<(String, DateTime)> Napomena)
     {
         this.ID = ID;
         this.Status = Status;
         this.Oznaka = Oznaka;
         this.Police = new List<string>();
-        foreach (String s in Police)
-            this.Police.Add(s);
         this.Napomena = new List<(string, DateTime)>();
         foreach ((String, DateTime) t in Napomena)
             this.Napomena.Add(t);
     }
 
-    public void DodajNoviObjekat(String Status, String Oznaka, List<String> Police, List<(String, DateTime)> Napomena)
+    public void DodajNoviObjekat(String Status, String Oznaka, List<(String, DateTime)> Napomena)
     {
         String ID = SledeciID.ToString();
         SledeciID++;
 
         if (Status == "AKTIVAN")
-            ListaAktivnih.Add(new Prostorija(ID, Status, Oznaka, Police, Napomena));
+            ListaAktivnih.Add(new Prostorija(ID, Status, Oznaka, Napomena));
         else
-            ListaNeaktivnih.Add(new Prostorija(ID, Status, Oznaka, Police, Napomena));
+            ListaNeaktivnih.Add(new Prostorija(ID, Status, Oznaka, Napomena));
     }
 
-    public int IspraviPodatkeObjekta(String ID, String Status, String Oznaka, List<String> Police, List<(String, DateTime)> Napomena)
+    public int IspraviPodatkeObjekta(String ID, String Status, String Oznaka, List<(String, DateTime)> Napomena)
     {
         for (int i = 0; i < ListaAktivnih.Count; i++)
             if (ListaAktivnih[i].ID == ID)
@@ -56,9 +53,9 @@ public class Prostorija : IProstorija
                 ListaAktivnih.RemoveAt(i);
 
                 if (Status == "AKTIVAN")
-                    ListaAktivnih.Add(new Prostorija(ID, Status, Oznaka, Police, Napomena));
+                    ListaAktivnih.Add(new Prostorija(ID, Status, Oznaka, Napomena));
                 else
-                    ListaNeaktivnih.Add(new Prostorija(ID, Status, Oznaka, Police, Napomena));
+                    ListaNeaktivnih.Add(new Prostorija(ID, Status, Oznaka, Napomena));
                 return 200;
             }
 
